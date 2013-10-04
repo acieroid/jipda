@@ -720,7 +720,58 @@ function schemeCesk(cc)
         return consequentState.concat(alternateState);
       }
     }
-  
+
+  function SetKont(node, benva)
+  {
+    this.node = node;
+    this.benva = benva;
+  }
+  SetKont.prototype.equals =
+    function (x)
+    {
+      return x instanceof SetKont
+        && this.node === x.node
+        && Eq.equals(this.benva, x.benva);
+    }
+  SetKont.prototype.hashCode =
+    function ()
+    {
+      var prime = 7;
+      var result = 1;
+      result = prime * result + this.node.hashCode();
+      result = prime * result + this.benva.hashCode();
+      return result;
+    }
+  SetKont.prototype.toString =
+    function ()
+    {
+      return "set-" + this.node.tag;
+    }
+  SetKont.prototype.addresses =
+    function ()
+    {
+      return [this.benva];
+    }
+  SetKont.prototype.apply =
+    function (value, store, kont)
+    {
+      var node = this.node;
+      var benva = this.benva;
+      var id = node.cdr.car;
+      var name = id.name;
+      var benv = store.lookupAval(benva);
+      var existing = benv.lookup(name);
+      if (existing === BOT)
+      {
+          throw new Error("cannot set! an undefined identifier");
+      }
+      benv = benv.add(name, value);
+      store = store.updateAval(benva, benv);
+      return kont.pop(function (frame) {
+        return new KontState(frame, L_UNDEFINED, store)
+      });
+    }
+
   function evalLiteral(node, benva, store, kont)
   {
     var value = l.abst1(node.valueOf());
@@ -799,7 +850,20 @@ function schemeCesk(cc)
     var frame = new BeginKont(node, exps, benva);
     return kont.push(frame, new EvalState(exps.car, benva, store));
   }
-  
+
+  function evalSet(node, benva, store, kont)
+  {
+    if (node.cdr instanceof Null || node.cdr.cdr instanceof Null ||
+        node.cdr.car instanceof Pair)
+    {
+      throw new Error("invalid set!: " + node);
+    }
+    var id = node.cdr.car;
+    var exp = node.cdr.cdr.car;
+    var frame = new SetKont(node, benva, store);
+    return kont.push(frame, new EvalState(exp, benva, store))
+  }
+
   function applyProc(node, operatorValue, operandValues, benva, store, kont)
   {
     var operatorAs = operatorValue.addresses();
@@ -873,6 +937,10 @@ function schemeCesk(cc)
         if (name === "begin")
         {
           return evalBegin(node, benva, store, kont);
+        }
+        if (name === "set!")
+        {
+          return evalSet(node, benva, store, kont);
         }
       }
       return evalApplication(node, benva, store, kont);
