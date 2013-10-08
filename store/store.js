@@ -41,7 +41,7 @@ StoreValue.prototype.update =
     }
     return this.weakUpdate(aval);
   }
-  
+
 StoreValue.prototype.strongUpdate =
   function (aval)
   {
@@ -63,11 +63,11 @@ StoreValue.prototype.join =
     }
     return new StoreValue(this.aval.join(x.aval), Math.max(this.fresh, x.fresh));
   }
-  
+
 StoreValue.prototype.reset =
   function ()
   {
-    return new StoreValue(BOT, 0);      
+    return new StoreValue(BOT, 0);
   }
 
 StoreValue.prototype.addresses =
@@ -75,7 +75,7 @@ StoreValue.prototype.addresses =
   {
     return this.aval.addresses();
   }
-  
+
 
 ///////////////
 
@@ -96,7 +96,7 @@ Store.prototype.compareTo =
   {
     return Lattice.subsumeComparison(this, x);
   }
-  
+
 Store.prototype.subsumes =
   function (x)
   {
@@ -137,7 +137,7 @@ Store.prototype.diff = // debug
         {
 //          else
 //          {
-            diff.push(address + ":\n\t" + value + " (" + value.fresh + ")\n\t" + xvalue + " (" + xvalue.fresh + ")");            
+            diff.push(address + ":\n\t" + value + " (" + value.fresh + ")\n\t" + xvalue + " (" + xvalue.fresh + ")");
 //          }
           if (value.aval.isBenv && xvalue.aval.isBenv)
           {
@@ -197,7 +197,7 @@ Store.prototype.lookupAval =
     }
     throw new Error("Store.lookupAval: no abstract value for address " + address + "\n" + this.nice());
   };
-  
+
 Store.prototype.allocAval =
   function (address, aval, undef)
   {
@@ -208,14 +208,14 @@ Store.prototype.allocAval =
     {
       var weaklyUpdatedValue = value.weakUpdate(aval);
 //        print("REALLOCATED", address, weaklyUpdatedValue);
-      var store = new Store(this.map.put(address, weaklyUpdatedValue)); 
+      var store = new Store(this.map.put(address, weaklyUpdatedValue));
       return store;
     }
     var newValue = new StoreValue(aval);
 //      print("ALLOCATED", address, newValue);
     return new Store(this.map.put(address, newValue));
   };
-    
+
 //Store.prototype.allocAval2 = // DEBUG
 //  function (address, aval, undef)
 //  {
@@ -228,14 +228,14 @@ Store.prototype.allocAval =
 //      print("joining with", aval, aval.parentas);
 //      var weaklyUpdatedValue = value.weakUpdate(aval);
 //      print("REALLOCATED", address, weaklyUpdatedValue.aval, weaklyUpdatedValue.aval.parentas);
-//      var store = new Store(this.map.put(address, weaklyUpdatedValue)); 
+//      var store = new Store(this.map.put(address, weaklyUpdatedValue));
 //      return store;
 //    }
 //    var newValue = new StoreValue(aval);
 //        print("ALLOCATED", address, newValue);
 //    return new Store(this.map.put(address, newValue));
 //  };
-      
+
 Store.prototype.updateAval =
   function (address, aval, msg)
   {
@@ -248,7 +248,7 @@ Store.prototype.updateAval =
     }
     throw new Error("Store.updateAval: no abstract value at address " + address);
   };
-  
+
 Store.prototype.join =
   function (store)
   {

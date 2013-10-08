@@ -3,7 +3,7 @@ function SetLattice(n)
 	return (function ()
 	{
 		var module = Object.create(new Lattice());
-		
+
 		function Some(cvalues)
 		{
 		  if (cvalues.length > 3 && cvalues.memberAt(undefined) > -1) {throw new Error(cvalues.toString())};
@@ -23,13 +23,13 @@ function SetLattice(n)
 		    {
 		      return 1;
 		    }
-		    
+
 //		    if (!x || !x.cvalues)
 //		    {
 ////		      throw new Error("cannot compare " + this + " with " + x);
 //		      return undefined; // when comparing values on stack, not sure whether types match
 //		    }
-		    
+
 		    var c = this.cvalues.length - x.cvalues.length;
 
 		    // undefined works great: undefined <= 0 === false; false <= 0 === true
@@ -39,22 +39,22 @@ function SetLattice(n)
 		    }
 		    else
 		    {
-          return x.cvalues.subsumes(this.cvalues) ? c : undefined;		      
+          return x.cvalues.subsumes(this.cvalues) ? c : undefined;
 		    }
 		  };
-		  
+
 		Some.prototype.hashCode =
 		  function ()
 		  {
 		    return this.cvalues.hashCode();
 		  }
-			
+
 		Some.prototype.toString =
 			function (printer)
 			{
 		    return "{" + this.cvalues.join(",") + "}";
 			};
-			
+
 		Some.prototype.join =
 			function (aval)
 			{
@@ -73,7 +73,7 @@ function SetLattice(n)
 				}
 				return new Some(cvalues);
 			};
-			
+
 		Some.prototype.meet =
 		  function (x)
 		  {
@@ -98,50 +98,50 @@ function SetLattice(n)
       {
         return this.cvalues.slice(0);
       };
-//      
+//
 //    Some.prototype.addresses =
 //      function ()
 //      {
 //        return this.cvalues.filter(function (x) {return x instanceof Addr});
 //      };
-//      
+//
 //    Some.prototype.isAddress =
 //      function ()
 //      {
 //        return this.addresses().length === this.cvalues.length;
 //      }
-	        
+
     Some.prototype.ToString =
       function ()
       {
         return new Some(this.cvalues.map(LatticeValue.ToString).toSet());
       };
-      
+
     Some.prototype.ToUInt32 =
       function ()
       {
         return new Some(this.cvalues.map(LatticeValue.ToUInt32).toSet());
       };
-      
+
     Some.prototype.ToInt32 =
       function ()
       {
         return new Some(this.cvalues.map(LatticeValue.ToInt32).toSet());
       };
-          
+
     Some.prototype.ToNumber =
       function ()
       {
         return new Some(this.cvalues.map(LatticeValue.ToNumber).toSet());
       };
-          
+
     Some.prototype.ToBoolean =
       function ()
       {
         return new Some(this.cvalues.map(LatticeValue.ToBoolean).toSet());
       };
-      
-    var Top = Object.create(new LatticeValue()); 
+
+    var Top = Object.create(new LatticeValue());
     Top.join = function (other) { return Top };
     Top.meet = function (x) {return x};
     Top.compareTo = function (other) { return other === Top ? 0 : 1 };
@@ -156,9 +156,9 @@ function SetLattice(n)
     Top.ToUInt32 = function () { return Top };
     Top.ToInt32 = function () { return Top };
     Top.ToNumber = function () { return Top };
-      
+
       module.Top = Top;
-    
+
       module.add =
         function (x, y)
         {
@@ -166,16 +166,16 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
           var left = x.conc();
           var right = y.conc();
           var combs = Arrays.cartesianProduct([left, right]);
-          return module.abst(combs.flatMap(function (p) { return p[0] + p[1]}));                  
+          return module.abst(combs.flatMap(function (p) { return p[0] + p[1]}));
         }
-        
+
       module.sub =
         function (x, y)
         {
@@ -183,16 +183,16 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
           var left = x.conc();
           var right = y.conc();
           var combs = Arrays.cartesianProduct([left, right]);
-          return module.abst(combs.flatMap(function (p) { return p[0] - p[1]}));                          
+          return module.abst(combs.flatMap(function (p) { return p[0] - p[1]}));
         }
-      
+
       module.mul =
         function (x, y)
         {
@@ -200,7 +200,7 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
@@ -209,7 +209,7 @@ function SetLattice(n)
           var combs = Arrays.cartesianProduct([left, right]);
           return module.abst(combs.flatMap(function (p) { return p[0] * p[1]}));
         }
-        
+
       module.div =
         function (x, y)
         {
@@ -217,7 +217,7 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
@@ -226,7 +226,7 @@ function SetLattice(n)
           var combs = Arrays.cartesianProduct([left, right]);
           return module.abst(combs.flatMap(function (p) { return p[0] / p[1]}));
         }
-        
+
       module.rem =
         function (x, y)
         {
@@ -234,7 +234,7 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
@@ -243,7 +243,7 @@ function SetLattice(n)
           var combs = Arrays.cartesianProduct([left, right]);
           return module.abst(combs.flatMap(function (p) { return p[0] % p[1]}));
         }
-        
+
       module.eqq =
         function (x, y)
         {
@@ -251,16 +251,16 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top; // TODO join(true, false)  [here and for other equal/rel preds]
           }
           var left = x.conc();
           var right = y.conc();
           var combs = Arrays.cartesianProduct([left, right]);
-          return module.abst(combs.flatMap(function (p) { return p[0] === p[1]}));        
+          return module.abst(combs.flatMap(function (p) { return p[0] === p[1]}));
         }
-        
+
       module.neqq =
         function (x, y)
         {
@@ -268,7 +268,7 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
@@ -277,7 +277,7 @@ function SetLattice(n)
           var combs = Arrays.cartesianProduct([left, right]);
           return module.abst(combs.flatMap(function (p) { return p[0] !== p[1]}));
         }
-        
+
       module.eq =
         function (x, y)
         {
@@ -285,7 +285,7 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
@@ -294,7 +294,7 @@ function SetLattice(n)
           var combs = Arrays.cartesianProduct([left, right]);
           return module.abst(combs.flatMap(function (p) { return p[0] == p[1]}));
         }
-        
+
       module.neq =
         function (x, y)
         {
@@ -302,7 +302,7 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
@@ -311,7 +311,7 @@ function SetLattice(n)
           var combs = Arrays.cartesianProduct([left, right]);
         return module.abst(combs.flatMap(function (p) { return p[0] != p[1]}));
         }
-        
+
       module.lt =
         function (x, y)
         {
@@ -319,7 +319,7 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
@@ -328,7 +328,7 @@ function SetLattice(n)
           var combs = Arrays.cartesianProduct([left, right]);
           return module.abst(combs.flatMap(function (p) { return p[0] < p[1]}));
         }
-        
+
       module.lte =
         function (x, y)
         {
@@ -336,7 +336,7 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
@@ -345,7 +345,7 @@ function SetLattice(n)
           var combs = Arrays.cartesianProduct([left, right]);
           return module.abst(combs.flatMap(function (p) { return p[0] <= p[1]}));
         }
-        
+
       module.gt =
         function (x, y)
         {
@@ -353,7 +353,7 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
@@ -362,7 +362,7 @@ function SetLattice(n)
           var combs = Arrays.cartesianProduct([left, right]);
           return module.abst(combs.flatMap(function (p) { return p[0] > p[1]}));
         }
-        
+
       module.gte =
         function (x, y)
         {
@@ -370,7 +370,7 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
@@ -379,7 +379,7 @@ function SetLattice(n)
           var combs = Arrays.cartesianProduct([left, right]);
           return module.abst(combs.flatMap(function (p) { return p[0] >= p[1]}));
         }
-        
+
       module.binand =
         function (x, y)
         {
@@ -387,7 +387,7 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
@@ -396,7 +396,7 @@ function SetLattice(n)
           var combs = Arrays.cartesianProduct([left, right]);
           return module.abst(combs.flatMap(function (p) { return p[0] & p[1]}));
         }
-        
+
       module.binor =
         function (x, y)
         {
@@ -404,7 +404,7 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
@@ -413,7 +413,7 @@ function SetLattice(n)
           var combs = Arrays.cartesianProduct([left, right]);
           return module.abst(combs.flatMap(function (p) { return p[0] | p[1]}));
         }
-        
+
       module.binnot =
         function (x)
         {
@@ -421,14 +421,14 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top) 
+          if (x === Top)
           {
             return Top;
           }
           var right = x.conc();
           return module.abst(right.map(function (p) { return ~p}));
         }
-        
+
       module.neg =
         function (x)
         {
@@ -436,14 +436,14 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top) 
+          if (x === Top)
           {
             return Top;
           }
           var right = x.conc();
-          return module.abst(right.map(function (p) { return -p}));        
+          return module.abst(right.map(function (p) { return -p}));
         }
-        
+
       module.pos =
         function (x)
         {
@@ -451,14 +451,14 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top) 
+          if (x === Top)
           {
             return Top;
           }
           var right = x.conc();
-          return module.abst(right.map(function (p) { return +p}));        
+          return module.abst(right.map(function (p) { return +p}));
         }
-        
+
       module.not =
         function (x)
         {
@@ -466,14 +466,14 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top) 
+          if (x === Top)
           {
             return Top;
           }
           var right = x.conc();
-          return module.abst(right.map(function (p) { return !p}));        
+          return module.abst(right.map(function (p) { return !p}));
         }
-        
+
       module.sqrt =
         function (x)
         {
@@ -481,14 +481,14 @@ function SetLattice(n)
           {
             return BOT;
           }
-          if (x === Top) 
+          if (x === Top)
           {
             return Top;
           }
           var right = x.conc();
-          return module.abst(right.map(Math.sqrt));        
+          return module.abst(right.map(Math.sqrt));
         }
-        
+
     module.abst =
       function (cvalues)
       {
@@ -503,26 +503,26 @@ function SetLattice(n)
         }
         return Top;
       };
-      
+
     module.abst1 =
       function (cvalue)
       {
         // assumes n > 0
         return new Some([cvalue]);
       }
-        
+
 //
 //    // assume rand1 is receiver type that is 'checked' before dispatching here
 //    function apply1(rator, rand1)
 //    {
 //      //print("|apply1| ", rator, rand1, rand2);
 //      var vals = rand1.conc();
-//      return module.abst(vals.map(rator));                  
-//    } 
-      
+//      return module.abst(vals.map(rator));
+//    }
+
     module.NUMBER = Top;
-    module.STRING = Top;    
-    
+    module.STRING = Top;
+
 		return module;
 	})();
 }

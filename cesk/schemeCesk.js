@@ -6,16 +6,16 @@ function schemeCesk(cc)
 //  var b = cc.b || new DefaultBenv();
   // primitive lattice
   var p = cc.p;
-  
+
   var memo = cc.memo || false;
-  
+
   assertDefinedNotNull(a);
 //  assertDefinedNotNull(b);
   assertDefinedNotNull(p);
 
   // lattice (primitives + addresses)
   var l = new JipdaLattice(p); // TODO this will become param
-  
+
   // install constants
   var L_UNDEFINED = l.abst1(undefined);
   var L_NULL = l.abst1(null);
@@ -30,7 +30,7 @@ function schemeCesk(cc)
   var P_NUMBER = p.NUMBER;
   var P_STRING = p.STRING;
   var P_DEFINED = P_TRUE.join(P_FALSE).join(P_NUMBER).join(P_STRING);
-  
+
   function Closure(node, statica, params, body)
   {
     this.node = node;
@@ -64,7 +64,7 @@ function schemeCesk(cc)
       return this.node === other.node
         && this.statica.equals(other.statica);
     }
-  
+
   Closure.prototype.hashCode =
     function (x)
     {
@@ -72,13 +72,13 @@ function schemeCesk(cc)
       var result = 1;
       result = prime * result + this.node.hashCode();
       result = prime * result + this.statica.hashCode();
-      return result;      
+      return result;
     }
-  
+
 //  Closure.prototype.compareTo =
 //    function (x)
 //    {
-//      return this.equals(x) ? 0 : undefined; 
+//      return this.equals(x) ? 0 : undefined;
 //    }
 
   Closure.prototype.apply_ =
@@ -111,48 +111,48 @@ function schemeCesk(cc)
     {
       return [this.statica];
     }
-  
+
   function Primitive(name, apply_)
   {
     this.name = name;
     this.apply_ = apply_;
   }
-  
+
   Primitive.prototype.hashCode =
     function ()
     {
       return this.name.hashCode();
     }
-  
+
   Primitive.prototype.addresses =
     function ()
     {
       return [];
     }
-  
+
   Primitive.prototype.toString =
     function ()
     {
       return this.name;
     }
-  
+
   function Procedure(procs)
   {
     this.procs = procs;
   }
-  
+
   Procedure.empty =
     function ()
     {
       return new Procedure([]);
     }
-  
+
   Procedure.from =
     function (procs)
     {
       return new Procedure(procs.slice(0));
     }
-  
+
   Procedure.prototype.equals =
     function (x)
     {
@@ -162,13 +162,13 @@ function schemeCesk(cc)
       }
       return this.procs.setEquals(x.procs);
     }
-  
+
   Procedure.prototype.hashCode =
     function ()
     {
       return this.procs.hashCode();
     }
-  
+
   Procedure.prototype.subsumes =
     function (x)
     {
@@ -178,13 +178,13 @@ function schemeCesk(cc)
       }
       return this.procs.subsumes(x.procs);
     }
-  
+
   Procedure.prototype.compareTo =
     function (x)
     {
       return Lattice.subsumeComparison(this, x);
     }
-  
+
   Procedure.prototype.join =
     function (x)
     {
@@ -194,19 +194,19 @@ function schemeCesk(cc)
       }
       return new Procedure(Arrays.deleteDuplicates(this.procs.concat(x.procs), Eq.equals));
     }
-  
+
   Procedure.prototype.addresses =
     function ()
     {
       return this.procs.flatMap(function (proc) {return proc.addresses()});
     }
-  
+
   Procedure.prototype.apply_ =
     function (application, operandValues, benva, store, kont)
     {
       return this.procs.flatMap(function (proc) {return proc.apply_(application, operandValues, benva, store, kont)});
     }
-  
+
   Procedure.prototype.toString =
     function ()
     {
@@ -216,66 +216,66 @@ function schemeCesk(cc)
   // install global environment
   var global = Benv.empty();
   var store = new Store();
-  
+
   function installPrimitive(name, apply_)
   {
     var proca = new ContextAddr(name, 0);
     var procRef = l.abst1(proca);
     var proc = Procedure.from([new Primitive(name, apply_)]);
     global = global.add(name, procRef);
-    store = store.allocAval(proca, proc);    
+    store = store.allocAval(proca, proc);
   }
-  
+
   global = global.add("#t", L_TRUE);
   global = global.add("#f", L_FALSE);
-  
-  installPrimitive("+", 
+
+  installPrimitive("+",
       function(application, operandValues, benva, store, kont)
       {
         var primValue = operandValues.reduce(function (acc, x) {return p.add(acc, x.prim)}, P_0);
         var value = l.product(primValue, []);
         return kont.pop(function (frame) {return new KontState(frame, value, store)});
       });
-  installPrimitive("-", 
+  installPrimitive("-",
       function(application, operandValues, benva, store, kont)
       {
         var primValue = operandValues.slice(1).reduce(function (acc, x) {return p.sub(acc, x.prim)}, operandValues[0].prim);
         var value = l.product(primValue, []);
         return kont.pop(function (frame) {return new KontState(frame, value, store)});
       });
-  installPrimitive("*", 
+  installPrimitive("*",
       function(application, operandValues, benva, store, kont)
       {
         var primValue = operandValues.reduce(function (acc, x) {return p.mul(acc, x.prim)}, P_1);
         var value = l.product(primValue, []);
         return kont.pop(function (frame) {return new KontState(frame, value, store)});
       });
-  installPrimitive("=", 
+  installPrimitive("=",
       function(application, operandValues, benva, store, kont)
       {
         var primValue = p.eq(operandValues[0].prim, operandValues[1].prim);
         var value = l.product(primValue, []);
         return kont.pop(function (frame) {return new KontState(frame, value, store)});
       });
-  installPrimitive("<", 
+  installPrimitive("<",
       function(application, operandValues, benva, store, kont)
       {
         var primValue = p.lt(operandValues[0].prim, operandValues[1].prim)
         var value = l.product(primValue, []);
         return kont.pop(function (frame) {return new KontState(frame, value, store)});
       });
-  installPrimitive("<=", 
+  installPrimitive("<=",
       function(application, operandValues, benva, store, kont)
       {
         var primValue = p.lte(operandValues[0].prim, operandValues[1].prim)
         var value = l.product(primValue, []);
         return kont.pop(function (frame) {return new KontState(frame, value, store)});
       });
-   
-  
+
+
   var globala = new ContextAddr("global", 0);
   store = store.allocAval(globala, global);
-  
+
   function InitState(node, benva, store, haltFrame)
   {
     this.type = "init";
@@ -298,7 +298,7 @@ function schemeCesk(cc)
     function (x)
     {
       return this.type === x.type
-        && this.node === x.node 
+        && this.node === x.node
         && Eq.equals(this.benva, x.benva)
         && Eq.equals(this.store, x.store)
         && Eq.equals(this.haltFrame, x.haltFrame);
@@ -351,7 +351,7 @@ function schemeCesk(cc)
     function (x)
     {
       return (x instanceof EvalState)
-        && this.node === x.node 
+        && this.node === x.node
         && Eq.equals(this.benva, x.benva)
         && Eq.equals(this.store, x.store);
     }
@@ -379,22 +379,22 @@ function schemeCesk(cc)
     {
       return new EvalState(this.node, this.benva, store);
     }
-  
+
   var kcc = 0;
   function KontState(frame, value, store)
   {
-    this.type = "kont";  
+    this.type = "kont";
     this.frame = frame;
     this.value = value;
     this.store = store;
-    this.age = kcc++; 
+    this.age = kcc++;
   }
   KontState.prototype.equals =
     function (x)
     {
       return (x instanceof KontState)
-        && Eq.equals(this.frame, x.frame) 
-        && Eq.equals(this.value, x.value) 
+        && Eq.equals(this.frame, x.frame)
+        && Eq.equals(this.value, x.value)
         && Eq.equals(this.store, x.store)
     }
   KontState.prototype.hashCode =
@@ -431,7 +431,7 @@ function schemeCesk(cc)
     {
       return new KontState(this.frame, this.value, store);
     }
-  
+
   function DefineKont(node, benva)
   {
     this.node = node;
@@ -441,7 +441,7 @@ function schemeCesk(cc)
     function (x)
     {
       return x instanceof DefineKont
-        && this.node === x.node 
+        && this.node === x.node
         && Eq.equals(this.benva, x.benva);
     }
   DefineKont.prototype.hashCode =
@@ -479,7 +479,7 @@ function schemeCesk(cc)
       store = store.updateAval(benva, benv); // side-effect
       return kont.pop(function (frame) {return new KontState(frame, value, store)});
     }
-  
+
   function OperatorKont(node, benva)
   {
     this.node = node;
@@ -522,7 +522,7 @@ function schemeCesk(cc)
       var node = this.node;
       var benva = this.benva;
       var operands = node.cdr;
-  
+
       if (operands instanceof Null)
       {
         return applyProc(node, operatorValue, [], benva, store, kont);
@@ -530,24 +530,24 @@ function schemeCesk(cc)
       var frame = new OperandsKont(node, operands, operatorValue, [], benva);
       return kont.push(frame, new EvalState(operands.car, benva, store));
     }
-  
+
   function OperandsKont(node, operands, operatorValue, operandValues, benva)
   {
     this.node = node;
     this.operands = operands;
-    this.operatorValue = operatorValue; 
-    this.operandValues = operandValues; 
+    this.operatorValue = operatorValue;
+    this.operandValues = operandValues;
     this.benva = benva;
   }
   OperandsKont.prototype.equals =
     function (x)
     {
       return x instanceof OperandsKont
-        && this.node === x.node 
-        && this.operands === x.operands 
-        && Eq.equals(this.operatorValue, x.operatorValue) 
-        && Eq.equals(this.operandValues, x.operandValues) 
-        && Eq.equals(this.benva, x.benva) 
+        && this.node === x.node
+        && this.operands === x.operands
+        && Eq.equals(this.operatorValue, x.operatorValue)
+        && Eq.equals(this.operandValues, x.operandValues)
+        && Eq.equals(this.benva, x.benva)
     }
   OperandsKont.prototype.hashCode =
     function ()
@@ -586,7 +586,7 @@ function schemeCesk(cc)
       var operatorValue = this.operatorValue;
       var operandValues = this.operandValues.addLast(operandValue);
       var operands = this.operands.cdr;
-      
+
       if (operands instanceof Null)
       {
         return applyProc(node, operatorValue, operandValues, benva, store, kont);
@@ -594,7 +594,7 @@ function schemeCesk(cc)
       var frame = new OperandsKont(node, operands, operatorValue, operandValues, benva);
       return kont.push(frame, new EvalState(operands.car, benva, store));
     }
-  
+
   function BeginKont(node, exps, benva)
   {
     this.node = node;
@@ -640,7 +640,7 @@ function schemeCesk(cc)
       var node = this.node;
       var benva = this.benva;
       var exps = this.exps.cdr;
-      
+
       if (exps.cdr instanceof Null)
       {
         return kont.unch(new EvalState(exps.car, benva, store));
@@ -648,7 +648,7 @@ function schemeCesk(cc)
       var frame = new BeginKont(node, exps, benva);
       return kont.push(frame, new EvalState(exps.car, benva, store));
     }
-  
+
   function IfKont(node, benva)
   {
     this.node = node;
@@ -658,7 +658,7 @@ function schemeCesk(cc)
     function (x)
     {
       return x instanceof IfKont
-        && this.node === x.node 
+        && this.node === x.node
         && Eq.equals(this.benva, x.benva);
     }
   IfKont.prototype.hashCode =
@@ -689,7 +689,7 @@ function schemeCesk(cc)
     function (conditionValue, store, kont)
     {
       var node = this.node;
-      var benva = this.benva;    
+      var benva = this.benva;
       var consequent = node.cdr.cdr.car;
       var alternate = node.cdr.cdr.cdr.car;
       var falseProj = conditionValue.meet(L_FALSE);
@@ -824,7 +824,7 @@ function schemeCesk(cc)
     var value = l.abst1(node.cdr.car);
     return kont.pop(function (frame) {return new KontState(frame, value, store)});
   }
-  
+
   function evalDefine(node, benva, store, kont)
   {
     var lval = node.cdr.car;
@@ -867,7 +867,7 @@ function schemeCesk(cc)
     }
     return kont.pop(function (frame) {return new KontState(frame, value, store)});
   }
-  
+
   function evalBegin(node, benva, store, kont)
   {
     var exps = node.cdr;
@@ -926,19 +926,19 @@ function schemeCesk(cc)
     var frame = new IfKont(node, benva);
     return kont.push(frame, new EvalState(condition, benva, store));
   }
-  
+
   function evalApplication(node, benva, store, kont)
   {
     var operator = node.car;
     var frame = new OperatorKont(node, benva);
-    return kont.push(frame, new EvalState(operator, benva, store));      
+    return kont.push(frame, new EvalState(operator, benva, store));
   }
 
   function evalNode(node, benva, store, kont)
-  {    
+  {
     if (node instanceof Number || node instanceof Boolean || node instanceof String || node instanceof Null)
     {
-      return evalLiteral(node, benva, store, kont);        
+      return evalLiteral(node, benva, store, kont);
     }
     if (node instanceof Sym)
     {
@@ -977,7 +977,7 @@ function schemeCesk(cc)
       }
       return evalApplication(node, benva, store, kont);
     }
-    throw new Error("cannot handle node " + node); 
+    throw new Error("cannot handle node " + node);
   }
 
   var module = {};
@@ -990,15 +990,15 @@ function schemeCesk(cc)
   module.l = l;
   module.store = store;
   module.globala = globala;
-  
-  module.inject = 
+
+  module.inject =
     function (node, override)
     {
       override = override || {};
       var benva = override.benva || globala;
       var haltFrame = new HaltKont([benva]);
-      return new InitState(node, benva, override.store || store, haltFrame);    
+      return new InitState(node, benva, override.store || store, haltFrame);
     }
-  
-  return module; 
+
+  return module;
 }

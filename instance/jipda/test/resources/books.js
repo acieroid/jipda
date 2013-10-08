@@ -1,19 +1,19 @@
 function Books()
 {
    var books = [];
-   
+
    this.addBook =
      function (book)
      {
        books.push(book);
      }
-   
+
    this.getNumberOfBooks =
      function ()
      {
        return books.length;
      }
-   
+
    this.getBooksOutOfPrint =
      function ()
      {

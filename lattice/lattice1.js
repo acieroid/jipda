@@ -3,7 +3,7 @@ function Lattice1()
 	return (function ()
 	{
 		var module = Object.create(Lattice.prototype);
-    
+
     var Num = new LatticeValue();
     Num.isNum = function (x) { return typeof x === "number"};
     Num.compareTo =
@@ -29,13 +29,13 @@ function Lattice1()
       {
         return "Num";
       };
-      
+
     Num.hashCode =
       function ()
       {
         return 3;
       }
-      
+
     Num.join =
       function (x)
       {
@@ -45,7 +45,7 @@ function Lattice1()
         }
         return Top;
       }
-    
+
     Num.meet =
       function (x)
       {
@@ -60,49 +60,49 @@ function Lattice1()
         }
         return BOT;
       }
-    
+
 //    Num.conc =
 //      function ()
 //      {
 //        return false;
 //      };
-      
+
     Num.ToString =
       function ()
       {
         return StrNum;
       };
-      
+
     Num.ToUInt32 =
       function ()
       {
         return Top;
       };
-      
+
     Num.ToInt32 =
       function ()
       {
         return Top;
       };
-          
+
     Num.ToNumber =
       function ()
       {
         return this;
       };
-          
+
     Num.ToBoolean =
       function ()
       {
         return Top;
       };
-      
+
     Num.accept =
       function (visitor)
       {
         return visitor.visitNum(this);
       }
-    
+
     var StrNum = new LatticeValue();
     StrNum.isStrNum = function (x) { return x === String(parseFloat(x))};
     StrNum.compareTo =
@@ -128,13 +128,13 @@ function Lattice1()
       {
         return "StrNum";
       };
-      
+
     StrNum.hashCode =
       function ()
       {
         return 5;
       }
-      
+
     StrNum.join =
       function (x)
       {
@@ -144,7 +144,7 @@ function Lattice1()
         }
         return Top;
       }
-    
+
     StrNum.meet =
       function (x)
       {
@@ -159,57 +159,57 @@ function Lattice1()
         }
         return BOT;
       }
-    
-    
+
+
 //    StrNum.conc =
 //      function ()
 //      {
 //        return false;
 //      };
-      
+
     StrNum.ToString =
       function ()
       {
         return this;
       };
-      
+
     StrNum.ToUInt32 =
       function ()
       {
         return Top;
       };
-      
+
     StrNum.ToInt32 =
       function ()
       {
         return Top;
       };
-          
+
     StrNum.ToNumber =
       function ()
       {
         return Num;
       };
-          
+
     StrNum.ToBoolean =
       function ()
       {
         return Top;
       };
-      
+
     StrNum.accept =
       function (visitor)
       {
         return visitor.visitStrNum(this);
       }
-    
+
 		function Some(cvalue)
 		{
 			this.cvalue = cvalue;
 			if (Num.isNum(cvalue))
 			{
 			  this.Num = true;
-			} 
+			}
 			else if (StrNum.isStrNum(cvalue)) // TODO can optimize this by using conversion from isNum as intermediate
 			{
 			  this.StrNum = true;
@@ -250,25 +250,25 @@ function Lattice1()
             return undefined;
           }
 		    }
-		    return Eq.equals(this.cvalue, x.cvalue) ? 0 : undefined;		      
+		    return Eq.equals(this.cvalue, x.cvalue) ? 0 : undefined;
 		  };
-		  
+
     Some.prototype.hashCode =
       function ()
       {
         return HashCode.hashCode(this.cvalue);
       }
-	      
+
 		Some.prototype.toString =
 			function (printer)
 			{
 		    if (printer)
 		    {
-	        return printer(this.cvalue);		      
+	        return printer(this.cvalue);
 		    }
 		    return String(this.cvalue);
 			};
-			
+
 	    Some.prototype.join =
 	      function (aval)
 	      {
@@ -306,7 +306,7 @@ function Lattice1()
           }
 	        return Object.is(this.cvalue, aval.cvalue) ? this : Top;
 	      }
-	      
+
 	  Some.prototype.meet =
       function (x)
       {
@@ -321,51 +321,51 @@ function Lattice1()
         }
         return BOT;
       }
-	    
+
 
     Some.prototype.conc =
       function ()
       {
         return [this.cvalue];
       };
-      
+
     Some.prototype.ToString =
       function ()
       {
         return new Some(LatticeValue.ToString(this.cvalue));
       };
-      
+
     Some.prototype.ToUInt32 =
       function ()
       {
         return new Some(LatticeValue.ToUInt32(this.cvalue));
       };
-        
+
     Some.prototype.ToInt32 =
       function ()
       {
         return new Some(LatticeValue.ToInt32(this.cvalue));
       };
-          
+
     Some.prototype.ToNumber =
       function ()
       {
         return new Some(LatticeValue.ToNumber(this.cvalue));
       };
-          
+
     Some.prototype.ToBoolean =
       function ()
       {
         return new Some(LatticeValue.ToBoolean(this.cvalue));
       };
-      
+
     Some.prototype.accept =
       function (visitor)
       {
         return visitor.visitSome(this);
       }
-      
-    var Top = Object.create(new LatticeValue()); 
+
+    var Top = Object.create(new LatticeValue());
     Top.join = function (other) { return Top };
     Top.meet = function (other) { return other };
     Top.compareTo = function (other) { return other === Top ? 0 : 1 };
@@ -382,7 +382,7 @@ function Lattice1()
     Top.ToNumber = function () { return Top };
     Top.length = function () { return Top };
     Top.accept = function (visitor) { return visitor.visitTop(this) };
-          
+
       module.add =
         function (x, y)
         {
@@ -420,7 +420,7 @@ function Lattice1()
           }
           return new Some(x.cvalue + y.cvalue);
         }
-        
+
       module.sub =
         function (x, y)
         {
@@ -448,7 +448,7 @@ function Lattice1()
           }
           return Num;
         }
-        
+
       module.div =
         function (x, y)
         {
@@ -460,9 +460,9 @@ function Lattice1()
           {
             return new Some(x.cvalue / y.cvalue);
           }
-          return Num;                
+          return Num;
         }
-        
+
 //      module.rem =
 //        function (x, y)
 //        {
@@ -470,7 +470,7 @@ function Lattice1()
 //          {
 //            return BOT;
 //          }
-//          if (x === Top || y === Top) 
+//          if (x === Top || y === Top)
 //          {
 //            return Top;
 //          }
@@ -478,9 +478,9 @@ function Lattice1()
 //          {
 //            return Top;
 //          }
-//          return new Some(x.cvalue % y.cvalue);                  
+//          return new Some(x.cvalue % y.cvalue);
 //        }
-//        
+//
       module.eqq =
         function (x, y)
         {
@@ -490,7 +490,7 @@ function Lattice1()
           }
           if (x instanceof Some && y instanceof Some)
           {
-            return new Some(x.cvalue === y.cvalue);                  
+            return new Some(x.cvalue === y.cvalue);
           }
           return Top;
         }
@@ -504,7 +504,7 @@ function Lattice1()
           }
           if (x instanceof Some && y instanceof Some)
           {
-            return new Some(x.cvalue == y.cvalue);                  
+            return new Some(x.cvalue == y.cvalue);
           }
           return Top;
         }
@@ -518,7 +518,7 @@ function Lattice1()
           }
           if (x instanceof Some && y instanceof Some)
           {
-            return new Some(x.cvalue === y.cvalue);                  
+            return new Some(x.cvalue === y.cvalue);
           }
           return Top;
         }
@@ -532,7 +532,7 @@ function Lattice1()
           }
           if (x instanceof Some && y instanceof Some)
           {
-            return new Some(x.cvalue != y.cvalue);                  
+            return new Some(x.cvalue != y.cvalue);
           }
           return Top;
         }
@@ -546,7 +546,7 @@ function Lattice1()
           }
           if (x instanceof Some && y instanceof Some)
           {
-            return new Some(x.cvalue < y.cvalue);                  
+            return new Some(x.cvalue < y.cvalue);
           }
           return Top;
         }
@@ -560,7 +560,7 @@ function Lattice1()
           }
           if (x instanceof Some && y instanceof Some)
           {
-            return new Some(x.cvalue <= y.cvalue);                  
+            return new Some(x.cvalue <= y.cvalue);
           }
           return Top;
         }
@@ -574,11 +574,11 @@ function Lattice1()
           }
           if (x instanceof Some && y instanceof Some)
           {
-            return new Some(x.cvalue > y.cvalue);                  
+            return new Some(x.cvalue > y.cvalue);
           }
           return Top;
         }
-    
+
       module.gte =
         function (x, y)
         {
@@ -588,11 +588,11 @@ function Lattice1()
           }
           if (x instanceof Some && y instanceof Some)
           {
-            return new Some(x.cvalue >= y.cvalue);                  
+            return new Some(x.cvalue >= y.cvalue);
           }
-          return Top;                 
+          return Top;
         }
-        
+
 //      module.binand =
 //        function (x, y)
 //        {
@@ -600,7 +600,7 @@ function Lattice1()
 //          {
 //            return BOT;
 //          }
-//          if (x === Top || y === Top) 
+//          if (x === Top || y === Top)
 //          {
 //            return Top;
 //          }
@@ -608,9 +608,9 @@ function Lattice1()
 //          {
 //            return Top;
 //          }
-//          return new Some(x.cvalue & y.cvalue);                  
+//          return new Some(x.cvalue & y.cvalue);
 //        }
-//        
+//
       module.binor =
         function (x, y)
         {
@@ -620,11 +620,11 @@ function Lattice1()
           }
           if (x instanceof Some && y instanceof Some)
           {
-            return new Some(x.cvalue | y.cvalue);                  
+            return new Some(x.cvalue | y.cvalue);
           }
-          return Num;                 
+          return Num;
         }
-        
+
       module.binnot =
         function (x)
         {
@@ -634,11 +634,11 @@ function Lattice1()
           }
           if (x instanceof Some)
           {
-            return new Some(~x.cvalue);                              
+            return new Some(~x.cvalue);
           }
           return Num;
         }
-        
+
       module.neg =
         function (x)
         {
@@ -646,7 +646,7 @@ function Lattice1()
           {
             return BOT;
           }
-          if (x === Top) 
+          if (x === Top)
           {
             return Top;
           }
@@ -654,9 +654,9 @@ function Lattice1()
           {
             return Num;
           }
-          return new Some(-x.cvalue);                  
+          return new Some(-x.cvalue);
         }
-//        
+//
 //      module.pos =
 //        function (x)
 //        {
@@ -664,7 +664,7 @@ function Lattice1()
 //          {
 //            return BOT;
 //          }
-//          if (x === Top) 
+//          if (x === Top)
 //          {
 //            return Top;
 //          }
@@ -672,9 +672,9 @@ function Lattice1()
 //          {
 //            return x;
 //          }
-//          return new Some(+x.cvalue);                  
+//          return new Some(+x.cvalue);
 //        }
-//        
+//
 //      module.not =
 //        function (x)
 //        {
@@ -682,7 +682,7 @@ function Lattice1()
 //          {
 //            return BOT;
 //          }
-//          if (x === Top) 
+//          if (x === Top)
 //          {
 //            return Top;
 //          }
@@ -690,9 +690,9 @@ function Lattice1()
 //          {
 //            return Top;
 //          }
-//          return new Some(!x.cvalue);                  
+//          return new Some(!x.cvalue);
 //        }
-//        
+//
       module.sqrt =
         function (x)
         {
@@ -700,13 +700,13 @@ function Lattice1()
           {
             return BOT;
           }
-          if (x instanceof Some) 
+          if (x instanceof Some)
           {
-            return new Some(Math.sqrt(x.cvalue));                  
+            return new Some(Math.sqrt(x.cvalue));
           }
           return Top;
         }
-      
+
 //      module.max =
 //        function (x, y)
 //        {
@@ -714,7 +714,7 @@ function Lattice1()
 //          {
 //            return BOT;
 //          }
-//          if (x === Top || y === Top) 
+//          if (x === Top || y === Top)
 //          {
 //            return Top;
 //          }
@@ -722,9 +722,9 @@ function Lattice1()
 //          {
 //            return Top;
 //          }
-//          return new Some(Math.max(x.cvalue, y.cvalue));                  
+//          return new Some(Math.max(x.cvalue, y.cvalue));
 //        }
-//        
+//
 //      module.shl =
 //        function (x, y)
 //        {
@@ -732,7 +732,7 @@ function Lattice1()
 //          {
 //            return BOT;
 //          }
-//          if (x === Top || y === Top) 
+//          if (x === Top || y === Top)
 //          {
 //            return Top;
 //          }
@@ -740,9 +740,9 @@ function Lattice1()
 //          {
 //            return Top;
 //          }
-//          return new Some(x.cvalue << y.cvalue);                  
+//          return new Some(x.cvalue << y.cvalue);
 //        }
-//        
+//
 //      module.abs = // absolute value, not abstraction function
 //        function (x)
 //        {
@@ -750,7 +750,7 @@ function Lattice1()
 //          {
 //            return BOT;
 //          }
-//          if (x === Top) 
+//          if (x === Top)
 //          {
 //            return Top;
 //          }
@@ -758,9 +758,9 @@ function Lattice1()
 //          {
 //            return x;
 //          }
-//          return new Some(Math.abs(x.cvalue));                  
+//          return new Some(Math.abs(x.cvalue));
 //        }
-//        
+//
 //      module.round =
 //        function (x)
 //        {
@@ -768,7 +768,7 @@ function Lattice1()
 //          {
 //            return BOT;
 //          }
-//          if (x === Top) 
+//          if (x === Top)
 //          {
 //            return Top;
 //          }
@@ -776,9 +776,9 @@ function Lattice1()
 //          {
 //            return x;
 //          }
-//          return new Some(Math.round(x.cvalue));                  
+//          return new Some(Math.round(x.cvalue));
 //        }
-//        
+//
 //      module.sin =
 //        function (x)
 //        {
@@ -786,7 +786,7 @@ function Lattice1()
 //          {
 //            return BOT;
 //          }
-//          if (x === Top) 
+//          if (x === Top)
 //          {
 //            return Top;
 //          }
@@ -794,9 +794,9 @@ function Lattice1()
 //          {
 //            return Top;
 //          }
-//          return new Some(Math.sin(x.cvalue));                  
+//          return new Some(Math.sin(x.cvalue));
 //        }
-//        
+//
 //      module.cos =
 //        function (x)
 //        {
@@ -804,7 +804,7 @@ function Lattice1()
 //          {
 //            return BOT;
 //          }
-//          if (x === Top) 
+//          if (x === Top)
 //          {
 //            return Top;
 //          }
@@ -812,27 +812,27 @@ function Lattice1()
 //          {
 //            return Top;
 //          }
-//          return new Some(Math.cos(x.cvalue));                  
+//          return new Some(Math.cos(x.cvalue));
 //        }
-        
+
     module.abst =
       function (cvalues)
       {
         return cvalues.map(module.abst1).reduce(Lattice.join, BOT);
       }
-      
+
     module.abst1 =
       function (cvalue)
       {
         return new Some(cvalue);
       }
-        
+
 //    module.Top = Top;
 //    module.StrNum = StrNum;
-    
+
     module.NUMBER = Num;
     module.STRING = Top;
-      
+
 		return module;
 	})();
 }

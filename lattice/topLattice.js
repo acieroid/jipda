@@ -3,8 +3,8 @@ function TopLattice()
 	return (function ()
 	{
 		var module = Object.create(new Lattice());
-		
-    var Top = Object.create(new LatticeValue()); 
+
+    var Top = Object.create(new LatticeValue());
     Top.join = function (other) { return this };
     Top.compareTo = function (other) { return other === Top ? 0 : 1};
     Top.isAddress = function () { return false };
@@ -18,9 +18,9 @@ function TopLattice()
     Top.ToInt32 = function () { return Top };
     Top.ToNumber = function () { return Top };
     Top.accept = function (visitor) { return visitor.visitTop(this) };
-      
+
       module.Top = Top;
-    
+
       module.add =
         function (x, y)
         {
@@ -30,7 +30,7 @@ function TopLattice()
           }
           return Top;
         }
-        
+
       module.sub =
         function (x, y)
         {
@@ -40,7 +40,7 @@ function TopLattice()
           }
           return Top;
         }
-      
+
       module.mul =
         function (x, y)
         {
@@ -50,7 +50,7 @@ function TopLattice()
           }
           return Top;
         }
-        
+
       module.div =
         function (x, y)
         {
@@ -60,7 +60,7 @@ function TopLattice()
           }
           return Top;
         }
-        
+
       module.eqq =
         function (x, y)
         {
@@ -70,7 +70,7 @@ function TopLattice()
           }
           return Top;
         }
-        
+
       module.neqq =
         function (x, y)
         {
@@ -80,7 +80,7 @@ function TopLattice()
           }
           return Top;
         }
-        
+
       module.eq =
         function (x, y)
         {
@@ -90,7 +90,7 @@ function TopLattice()
           }
           return Top;
         }
-        
+
       module.neq =
         function (x, y)
         {
@@ -100,7 +100,7 @@ function TopLattice()
           }
           return Top;
         }
-        
+
       module.lt =
         function (x, y)
         {
@@ -110,7 +110,7 @@ function TopLattice()
           }
           return Top;
         }
-        
+
       module.lte =
         function (x, y)
         {
@@ -120,7 +120,7 @@ function TopLattice()
           }
           return Top;
         }
-        
+
       module.gt =
         function (x, y)
         {
@@ -130,7 +130,7 @@ function TopLattice()
           }
           return Top;
         }
-        
+
       module.gte =
         function (x, y)
         {
@@ -140,7 +140,7 @@ function TopLattice()
           }
           return Top;
         }
-        
+
       module.binand =
         function (x, y)
         {
@@ -150,7 +150,7 @@ function TopLattice()
           }
           return Top;
         }
-        
+
       module.binor =
         function (x, y)
         {
@@ -160,25 +160,25 @@ function TopLattice()
           }
           return Top;
         }
-        
+
       module.binnot =
         function (x)
         {
           return x;
         }
-        
+
       module.neg =
         function (x)
         {
           return x;
         }
-        
+
       module.sqrt =
         function (x)
         {
           return x;
         }
-        
+
     module.abst =
       function (cvalues)
       {
@@ -188,25 +188,25 @@ function TopLattice()
         }
         return Top;
       };
-      
+
     module.abst1 =
       function (cvalue)
       {
         return Top;
       }
-        
+
 		module.isFalse =
 			function (aval)
 			{
-		    return false; 
+		    return false;
 			}
-			
+
     module.isTrue =
       function (aval)
       {
         return false;
       }
-      
+
 		return module;
 	})();
 }

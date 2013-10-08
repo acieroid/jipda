@@ -27,7 +27,7 @@ HaltKont.prototype.addresses =
   {
     return this.rootSet;
   }
-  
+
 function Edge(source, g, target, marks)
 {
   this.source = source;
@@ -35,12 +35,12 @@ function Edge(source, g, target, marks)
   this.target = target;
   this.marks = marks;
 }
-Edge.source = 
+Edge.source =
   function (edge)
   {
     return edge.source;
   }
-Edge.target = 
+Edge.target =
   function (edge)
   {
     return edge.target;
@@ -68,7 +68,7 @@ Edge.prototype.hashCode =
     result = prime * result + HashCode.hashCode(this.g);
     result = prime * result + this.target.hashCode();
     result = prime * result + HashCode.hashCode(this.marks);
-    return result;    
+    return result;
   }
 
 function Graph(edges)
@@ -111,13 +111,13 @@ Graph.prototype.addEdge =
   function (edge)
   {
     var edges = this._edges.add(edge);
-    return new Graph(edges);    
+    return new Graph(edges);
   }
 
 Graph.prototype.addEdges =
   function (edges)
   {
-    return new Graph(this._edges.addAll(edges));    
+    return new Graph(this._edges.addAll(edges));
   }
 
 Graph.prototype.removeEdge =
@@ -207,7 +207,7 @@ Push.prototype.hashCode =
     var prime = 11;
     var result = 1;
     result = prime * result + this.frame.hashCode();
-    return result;    
+    return result;
   }
 Push.prototype.toString =
   function ()
@@ -230,7 +230,7 @@ Pop.prototype.hashCode =
     var prime = 13;
     var result = 1;
     result = prime * result + this.frame.hashCode();
-    return result;    
+    return result;
   }
 Pop.prototype.toString =
   function ()
@@ -253,7 +253,7 @@ Unch.prototype.hashCode =
     var prime = 17;
     var result = 1;
     result = prime * result + HashCode.hashCode(this.frame);
-    return result;    
+    return result;
   }
 Unch.prototype.toString =
   function ()
@@ -339,7 +339,7 @@ GcDriver.gc =
     var store = q.store;
     var rootSet = q.addresses().concat(stackAddresses);
     var store2 = Agc.collect(store, rootSet);
-    var gcq = q.setStore(store2); 
+    var gcq = q.setStore(store2);
     return gcq;
   }
 
@@ -348,10 +348,10 @@ GcDriver.prototype.pushUnch =
   {
     var sa = stack.flatMap(function (frame) {return frame.addresses()}).toSet();
     var gcq = GcDriver.gc(q, stack);
-    var edges = this.driver.pushUnch(gcq, stack); 
+    var edges = this.driver.pushUnch(gcq, stack);
     return edges.map(function (edge) {return new Edge(q, edge.g, edge.target)});
   }
-    
+
 GcDriver.prototype.pop =
   function (q, frame, stack)
   {
@@ -370,7 +370,7 @@ Pushdown.run =
   {
 //      var k = ceskDriver;
     var k = new GcDriver(ceskDriver);
-  
+
     var etg = Graph.empty();
     var ecg = Graph.empty();
     var emptySet = ArraySet.empty();
@@ -378,7 +378,7 @@ Pushdown.run =
     var dE = [];
     var dH = [];
     var dS = [q];
-    
+
     function propagateStack(s1, s2)
     {
       var currentSource = ss.get(s1, emptySet);
@@ -386,11 +386,11 @@ Pushdown.run =
       var target = currentSource.join(currentTarget);
       ss = ss.put(s2, target);
     }
-    
+
     function sprout(q)
     {
       var frames = ss.get(q, emptySet).values();
-      var pushUnchEdges = k.pushUnch(q, frames); 
+      var pushUnchEdges = k.pushUnch(q, frames);
       dE = dE.concat(pushUnchEdges);
 //      dH = dH.concat(pushUnchEdges
 //                .filter(function (pushUnchEdge) {return pushUnchEdge.g.isUnch})
@@ -398,7 +398,7 @@ Pushdown.run =
     }
 
     function addPush(s, frame, q)
-    { 
+    {
       propagateStack(s, q);
       ss = ss.put(q, ss.get(q).add(frame));
       var qset1 = ecg.successors(q);
@@ -438,7 +438,7 @@ Pushdown.run =
       var sset4 = ecg.successors(s3);
       dH = dH.concat(sset1.flatMap(function (s1) {return sset4.map(function (s4) {return new Edge(s1, null, s4)})}));
       dH = dH.concat(sset1.map(
-        function (s1) 
+        function (s1)
         {
           return new Edge(s1, null, s3)
         }));
@@ -472,7 +472,7 @@ Pushdown.run =
           return popEdges.map(function (popEdge) {return new Edge(pushEdge.source, new Unch(pushEdge.g.frame), popEdge.target)});
         }));
     }
-    
+
     while (true)
     {
       // epsilon edges
@@ -502,7 +502,7 @@ Pushdown.run =
           if (!etg.containsTarget(q1))
           {
             dS = dS.addLast(q1);
-          }            
+          }
           etg = etg.addEdge(e);
           ecg = ecg.addEdge(new Edge(q, null, q)).addEdge(new Edge(q1, null, q1));
           if (g.isPush)
@@ -556,7 +556,7 @@ Pushdown.preStackUntil =
       var q = e.source;
       var incomingEtg = etg.incoming(q).filter(function (edge) {return !edge.g.isPop});
       var incomingEcg = ecg.incoming(q);
-      todo = todo.concat(incomingEtg).concat(incomingEcg);        
+      todo = todo.concat(incomingEtg).concat(incomingEcg);
     }
     return {targets:targets,visited:visited};
   }
@@ -619,7 +619,7 @@ Dsg.prototype.stepBwOver =
 //    return this.etg.outgoing.flatMap(function (e1) {return e1.g.isPush && e1.g.frame.equals(frame)});
 //  }
 
-Dsg.prototype.popValues = 
+Dsg.prototype.popValues =
   function (s)
   {
     var targets = HashSet.empty();

@@ -1,9 +1,9 @@
-var suiteLatticeTests = 
-  
-(function () 
+var suiteLatticeTests =
+
+(function ()
 {
   var module = new TestSuite("suiteLatticeTests");
-  
+
   module.sanityCheck =
     function (lat)
     {
@@ -19,9 +19,9 @@ var suiteLatticeTests =
       var nan = lat.abst1(NaN);
       var pinf = lat.abst1(+Infinity);
       var ninf = lat.abst1(-Infinity);
-      
+
       var vals = [undef, nul, sint, int, float, str, strnum, fals, tru, nan, pinf, ninf];
-      
+
       vals.forEach(function (val) {
         assertTrue(val.join(val).equals(val));
         assertTrue(val.join(val).compareTo(val) === 0);
@@ -30,35 +30,35 @@ var suiteLatticeTests =
         assertTrue(val.subsumes(val.join(val)));
       })
     }
-  
+
   module.testLattice1 =
     function()
     {
       var lat = new Lattice1();
       module.sanityCheck(lat);
     }
-  
+
   module.testCpLattice =
     function()
     {
       var lat = new CpLattice();
       module.sanityCheck(lat);
     }
-  
+
   module.testSetLattice1 =
     function()
     {
       var lat = new LatN(1);
       module.sanityCheck(lat);
     }
-  
+
   module.testSetLattice2 =
     function()
     {
       var lat = new LatN(2);
       module.sanityCheck(lat);
     }
-  
+
   return module;
-  
+
 })()

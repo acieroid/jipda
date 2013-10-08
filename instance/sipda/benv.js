@@ -4,7 +4,7 @@ function Benv(map, parentas)
   assertTrue(Array.isArray(parentas));
   assertFalse(Arrays.contains(undefined, map.values(), Eq.equals));
   this._map = map;
-  this.parentas = parentas; 
+  this.parentas = parentas;
 }
 
 Benv.empty =
@@ -42,7 +42,7 @@ Benv.prototype.subsumes =
     {
       return true;
     }
-    if (!this.parentas.subsumes(x.parentas)) 
+    if (!this.parentas.subsumes(x.parentas))
     {
       return false;
     }
@@ -121,9 +121,9 @@ Benv.prototype.join =
   {
     var map = this._map.join(x._map);
     var parentas = Arrays.union(this.parentas, x.parentas, Eq.equals);
-    var result = new Benv(map, parentas); 
+    var result = new Benv(map, parentas);
     return result;
-  } 
+  }
 
 Benv.prototype.addresses =
   function ()

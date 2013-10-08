@@ -8,7 +8,7 @@ function t()
 
 function displayTestResults(result)
 {
-	var log = result.log.flatten(); 
+	var log = result.log.flatten();
 	log.forEach(
 		function (entry)
 		{
@@ -50,7 +50,7 @@ TestSuite.runSuites =
 		var end = Date.now();
 		return { success: success, fail: fail, log: log, time: (end - start)};
 	};
-	
+
 TestSuite.prototype.run =
 	function ()
 	{

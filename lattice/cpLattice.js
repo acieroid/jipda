@@ -3,7 +3,7 @@ function CpLattice()
 	return (function ()
 	{
 		var module = Object.create(Lattice.prototype);
-		
+
 		function Some(cvalue)
 		{
 			this.cvalue = cvalue;
@@ -17,31 +17,31 @@ function CpLattice()
 		    {
 		      return -1;
 		    }
-		    
+
 		    if (!x)
 		    {
 		      return undefined;
 		    }
-		    
-        return Eq.equals(this.cvalue, x.cvalue) ? 0 : undefined;		      
+
+        return Eq.equals(this.cvalue, x.cvalue) ? 0 : undefined;
 		  };
-		  
+
 		Some.prototype.hashCode =
 		  function ()
 		  {
 		    return HashCode.hashCode(this.cvalue);
 		  }
-			
+
 		Some.prototype.toString =
 			function (printer)
 			{
 		    if (printer)
 		    {
-	        return printer(this.cvalue);		      
+	        return printer(this.cvalue);
 		    }
 		    return String(this.cvalue);
 			};
-			
+
     Some.prototype.join =
       function (aval)
       {
@@ -67,44 +67,44 @@ function CpLattice()
       {
         return [this.cvalue];
       };
-      
+
     Some.prototype.ToString =
       function ()
       {
         return new Some(LatticeValue.ToString(this.cvalue));
       };
-      
+
     Some.prototype.ToUInt32 =
       function ()
       {
         return new Some(LatticeValue.ToUInt32(this.cvalue));
       };
-      
+
     Some.prototype.ToInt32 =
       function ()
       {
         return new Some(LatticeValue.ToInt32(this.cvalue));
       };
-          
+
     Some.prototype.ToNumber =
       function ()
       {
         return new Some(LatticeValue.ToNumber(this.cvalue));
       };
-          
+
     Some.prototype.ToBoolean =
       function ()
       {
         return new Some(LatticeValue.ToBoolean(this.cvalue));
       };
-      
+
     Some.prototype.accept =
       function (visitor)
       {
         return visitor.visitSome(this);
       }
-      
-    var Top = Object.create(new LatticeValue()); 
+
+    var Top = Object.create(new LatticeValue());
     Top.join = function (other) { return Top };
     Top.meet = function (other) { return other };
     Top.compareTo = function (other) { return other === Top ? 0 : 1 };
@@ -127,9 +127,9 @@ function CpLattice()
     Top.projectBoolean = function () { return Top };
     Top.length = function () { return Top };
     Top.accept = function (visitor) { return visitor.visitTop(this) };
-      
+
       module.Top = Top;
-    
+
       module.add =
         function (x, y)
         {
@@ -137,13 +137,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
-          return new Some(x.cvalue + y.cvalue);                  
+          return new Some(x.cvalue + y.cvalue);
         }
-        
+
       module.sub =
         function (x, y)
         {
@@ -151,13 +151,13 @@ function CpLattice()
         {
           return BOT;
         }
-        if (x === Top || y === Top) 
+        if (x === Top || y === Top)
         {
           return Top;
         }
-        return new Some(x.cvalue - y.cvalue);                  
+        return new Some(x.cvalue - y.cvalue);
         }
-      
+
       module.mul =
         function (x, y)
         {
@@ -165,13 +165,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
-          return new Some(x.cvalue * y.cvalue);                  
+          return new Some(x.cvalue * y.cvalue);
         }
-        
+
       module.div =
         function (x, y)
         {
@@ -179,13 +179,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
-          return new Some(x.cvalue / y.cvalue);                  
+          return new Some(x.cvalue / y.cvalue);
         }
-        
+
       module.rem =
         function (x, y)
         {
@@ -193,13 +193,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
-          return new Some(x.cvalue % y.cvalue);                  
+          return new Some(x.cvalue % y.cvalue);
         }
-        
+
       module.eqq =
         function (x, y)
         {
@@ -207,13 +207,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top; // TODO join(true, false)  [here and for other equal/rel preds]
           }
-          return new Some(x.cvalue === y.cvalue);                  
+          return new Some(x.cvalue === y.cvalue);
         }
-        
+
       module.neqq =
         function (x, y)
         {
@@ -221,13 +221,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
-          return new Some(x.cvalue !== y.cvalue);                  
+          return new Some(x.cvalue !== y.cvalue);
         }
-        
+
       module.eq =
         function (x, y)
         {
@@ -235,13 +235,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
-          return new Some(x.cvalue == y.cvalue);                  
+          return new Some(x.cvalue == y.cvalue);
         }
-        
+
       module.neq =
         function (x, y)
         {
@@ -249,13 +249,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
-          return new Some(x.cvalue != y.cvalue);                  
+          return new Some(x.cvalue != y.cvalue);
         }
-        
+
       module.lt =
         function (x, y)
         {
@@ -263,13 +263,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
-          return new Some(x.cvalue < y.cvalue);                  
+          return new Some(x.cvalue < y.cvalue);
         }
-        
+
       module.lte =
         function (x, y)
         {
@@ -277,13 +277,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
-          return new Some(x.cvalue <= y.cvalue);                  
+          return new Some(x.cvalue <= y.cvalue);
         }
-        
+
       module.gt =
         function (x, y)
         {
@@ -291,13 +291,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
-          return new Some(x.cvalue > y.cvalue);                  
+          return new Some(x.cvalue > y.cvalue);
         }
-        
+
       module.gte =
         function (x, y)
         {
@@ -305,13 +305,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
-          return new Some(x.cvalue >= y.cvalue);                  
+          return new Some(x.cvalue >= y.cvalue);
         }
-        
+
       module.binand =
         function (x, y)
         {
@@ -319,13 +319,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
-          return new Some(x.cvalue & y.cvalue);                  
+          return new Some(x.cvalue & y.cvalue);
         }
-        
+
       module.binor =
         function (x, y)
         {
@@ -333,13 +333,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
-          return new Some(x.cvalue | y.cvalue);                  
+          return new Some(x.cvalue | y.cvalue);
         }
-        
+
       module.binnot =
         function (x)
         {
@@ -347,13 +347,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top) 
+          if (x === Top)
           {
             return Top;
           }
-          return new Some(~x.cvalue);                  
+          return new Some(~x.cvalue);
         }
-        
+
       module.neg =
         function (x)
         {
@@ -361,13 +361,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top) 
+          if (x === Top)
           {
             return Top;
           }
-          return new Some(-x.cvalue);                  
+          return new Some(-x.cvalue);
         }
-        
+
       module.pos =
         function (x)
         {
@@ -375,13 +375,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top) 
+          if (x === Top)
           {
             return Top;
           }
-          return new Some(+x.cvalue);                  
+          return new Some(+x.cvalue);
         }
-        
+
       module.not =
         function (x)
         {
@@ -389,13 +389,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top) 
+          if (x === Top)
           {
             return Top;
           }
-          return new Some(!x.cvalue);                  
+          return new Some(!x.cvalue);
         }
-        
+
       module.sqrt =
         function (x)
         {
@@ -403,13 +403,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top) 
+          if (x === Top)
           {
             return Top;
           }
-          return new Some(Math.sqrt(x.cvalue));                  
+          return new Some(Math.sqrt(x.cvalue));
         }
-      
+
       module.max =
         function (x, y)
         {
@@ -417,13 +417,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
-          return new Some(Math.max(x.cvalue, y.cvalue));                  
+          return new Some(Math.max(x.cvalue, y.cvalue));
         }
-        
+
       module.shl =
         function (x, y)
         {
@@ -431,13 +431,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top || y === Top) 
+          if (x === Top || y === Top)
           {
             return Top;
           }
-          return new Some(x.cvalue << y.cvalue);                  
+          return new Some(x.cvalue << y.cvalue);
         }
-        
+
       module.abs = // absolute value, not abstraction function
         function (x)
         {
@@ -445,13 +445,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top) 
+          if (x === Top)
           {
             return Top;
           }
-          return new Some(Math.abs(x.cvalue));                  
+          return new Some(Math.abs(x.cvalue));
         }
-        
+
       module.round =
         function (x)
         {
@@ -459,13 +459,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top) 
+          if (x === Top)
           {
             return Top;
           }
-          return new Some(Math.round(x.cvalue));                  
+          return new Some(Math.round(x.cvalue));
         }
-        
+
       module.sin =
         function (x)
         {
@@ -473,13 +473,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top) 
+          if (x === Top)
           {
             return Top;
           }
-          return new Some(Math.sin(x.cvalue));                  
+          return new Some(Math.sin(x.cvalue));
         }
-        
+
       module.cos =
         function (x)
         {
@@ -487,13 +487,13 @@ function CpLattice()
           {
             return BOT;
           }
-          if (x === Top) 
+          if (x === Top)
           {
             return Top;
           }
-          return new Some(Math.cos(x.cvalue));                  
+          return new Some(Math.cos(x.cvalue));
         }
-        
+
     module.abst =
       function (cvalues)
       {
@@ -507,16 +507,16 @@ function CpLattice()
         }
         return Top;
       };
-      
+
     module.abst1 =
       function (cvalue)
       {
         return new Some(cvalue);
       }
-        
+
     module.NUMBER = Top;
     module.STRING = Top;
-    
+
 		return module;
 	})();
 }

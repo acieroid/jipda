@@ -13,7 +13,7 @@ Lattice.prototype.isStringArrayIndex =
     var uspn = value.ToUInt32();
     var suspn = uspn.ToString();
     var length;
-    if (suspn.equals(value) 
+    if (suspn.equals(value)
         && this.isTrue(this.lt(uspn, this.abst1(Ecma.POW_2_32))))
     {
       return uspn;
@@ -69,7 +69,7 @@ Lattice.subsumeComparison =
     var s2 = x2.subsumes(x1);
     return s1 ? (s2 ? 0 : 1) : (s2 ? -1 : undefined);
   }
-  
+
 
 LatticeValue.prototype.equals =
   function (x)
@@ -140,7 +140,7 @@ LatticeValue.ToUInt32 =
     }
     var p = Ecma.sign(n) * Math.floor(Math.abs(n));
     var i = p % Ecma.POW_2_32;
-    return i;  
+    return i;
   }
 
 LatticeValue.ToString =
@@ -172,7 +172,7 @@ LatticeValue.ToString =
     }
     throw new Error(x);
   }
-  
+
 //9.2
 LatticeValue.ToBoolean =
   function (x)
@@ -199,7 +199,7 @@ LatticeValue.ToInt32 =
   }
 
 
-var BOT = Object.create(new LatticeValue()); // should be 'const', but gives problems with rebuilding 
+var BOT = Object.create(new LatticeValue()); // should be 'const', but gives problems with rebuilding
 BOT.join = function (other) { return other };
 BOT.meet = function (other) { return BOT };
 BOT.compareTo = function (other) { return other === BOT ? 0 : -1 };
@@ -338,7 +338,7 @@ JipdaValue.prototype.compareTo =
     {
       return 1;
     }
-    
+
     if (x === this)
     {
       return 0;

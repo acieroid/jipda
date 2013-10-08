@@ -1,7 +1,7 @@
 var Ast = (function ()
 {
   var module = {};
-  
+
   function nodeToString(node)
   {
     if (node === null)
@@ -12,12 +12,12 @@ var Ast = (function ()
     {
       case "Literal":
         return ""+node.value;
-      case "Identifier": 
+      case "Identifier":
         return node.name;
-      case "BinaryExpression": 
-      case "LogicalExpression": 
+      case "BinaryExpression":
+      case "LogicalExpression":
         return nodeToString(node.left) + node.operator + nodeToString(node.right);
-      case "CallExpression": 
+      case "CallExpression":
         return nodeToString(node.callee) + "(" + node.arguments.map(nodeToString).join() + ")";
       case "FunctionExpression":
         return "function (" + node.params.map(nodeToString).join() + ") " + nodeToString(node.body);
@@ -61,7 +61,7 @@ var Ast = (function ()
         }
         return "break;";
       case "LabeledStatement":
-        return nodeToString(node.label) + ":" + nodeToString(node.body); 
+        return nodeToString(node.label) + ":" + nodeToString(node.body);
       case "IfStatement":
         if (node.alternate === null)
         {
@@ -81,23 +81,23 @@ var Ast = (function ()
           return "default: " + node.consequent.map(nodeToString).join(" ");
         }
         return "case " + nodeToString(node.test) + ": " + node.consequent.map(nodeToString).join(" ");
-      case "WhileStatement": 
+      case "WhileStatement":
         return "while (" + nodeToString(node.test) + ") " + nodeToString(node.body);
-      case "DoWhileStatement": 
+      case "DoWhileStatement":
         return "do " + nodeToString(node.body) + " while (" + nodeToString(node.test) + ")";
       case "ForStatement":
         return "for (" + nodeToString(node.init) + ";" + nodeToString(node.test) + ";" + nodeToString(node.update) + ") " + nodeToString(node.body) + ";";
-      case "FunctionDeclaration": 
+      case "FunctionDeclaration":
         return "function " + nodeToString(node.id) + "(" + node.params.map(nodeToString).join() + ") " + nodeToString(node.body) + ";";
-      case "VariableDeclaration": 
+      case "VariableDeclaration":
         return node.kind + " " + node.declarations.map(nodeToString).join() + ";";
-      case "VariableDeclarator": 
+      case "VariableDeclarator":
         return nodeToString(node.id) + (node.init ? "=" + nodeToString(node.init) : "");
-      case "Property": 
+      case "Property":
         return nodeToString(node.key) + ":" + nodeToString(node.value);
-      case "Program": 
+      case "Program":
         return node.body.map(nodeToString).join(" ");
-      case "BlockStatement": 
+      case "BlockStatement":
         return "{" + node.body.map(nodeToString).join(" ") + "}";
       case "TryStatement":
         return "try " + nodeToString(node.block) + " " + node.handlers.map(nodeToString).join(" ");
@@ -108,15 +108,15 @@ var Ast = (function ()
       case "EmptyStatement":
         return ";";
       default:
-        throw new Error("nodeToString: cannot handle " + node.type); 
+        throw new Error("nodeToString: cannot handle " + node.type);
       }
   }
-  
+
   function isIdentifier(n)
   {
     return n.type === "Identifier";
   }
-  
+
   /*
   function isVariable(n, ast)
   {
@@ -128,147 +128,147 @@ var Ast = (function ()
     return false;
   }
   */
-  
+
   function isObjectExpression(n)
   {
     return n.type === "ObjectExpression";
   }
-  
+
   function isReturnStatement(n)
   {
     return n.type === "ReturnStatement";
   }
-  
+
   function isBreakStatement(n)
   {
     return n.type === "BreakStatement";
   }
-  
+
   function isLabeledStatement(n)
   {
     return n.type === "LabeledStatement";
   }
-  
+
   module.isCallExpression =
     function (n)
     {
       return n.type === "CallExpression";
     }
-  
+
   function isVariableDeclaration(n)
   {
     return n.type === "VariableDeclaration";
   }
-  
+
   function isVariableDeclarator(n)
   {
     return n.type === "VariableDeclarator";
   }
-  
+
   function isAssignmentExpression(n)
   {
     return n.type === "AssignmentExpression";
   }
-  
+
   function isBinaryExpression(n)
   {
     return n.type === "BinaryExpression";
   }
-  
+
   function isLogicalExpression(n)
   {
     return n.type === "BinaryExpression";
   }
-  
+
   function isUnaryExpression(n)
   {
     return n.type === "UnaryExpression";
   }
-  
+
   function isFunctionExpression(n)
   {
     return n.type === "FunctionExpression";
   }
-  
+
   function isNewExpression(n)
   {
     return n.type === "NewExpression";
   }
-  
+
   function isArrayExpression(n)
   {
     return n.type === "ArrayExpression";
   }
-  
+
   function isFunctionDeclaration(n)
   {
     return n.type === "FunctionDeclaration";
   }
-  
+
   function isProgram(n)
   {
     return n.type === "Program";
   }
-  
+
   function isBlockStatement(n)
   {
     return n.type === "BlockStatement";
   }
-  
+
   function isThisExpression(n)
   {
     return n.type === "ThisExpression";
   }
-  
+
   module.isMemberExpression =
     function (n)
     {
       return n.type === "MemberExpression";
     }
-  
+
   function isUpdateExpression(n)
   {
     return n.type === "UpdateExpression";
   }
-  
+
   function isTryStatement(n)
   {
     return n.type === "TryStatement";
   }
-  
+
   function isCatchClause(n)
   {
     return n.type === "CatchClause";
   }
-  
+
   function isIfStatement(n)
   {
     return n.type === "IfStatement";
   }
-  
+
   function isConditionalExpression(n)
   {
     return n.type === "ConditionalExpression";
   }
-  
+
   function isSwitchStatement(n)
   {
     return n.type === "SwitchStatement";
   }
-  
+
   function children(node)
   {
     switch (node.type)
     {
-      case "Literal": 
+      case "Literal":
       case "Identifier":
         return [];
-      case "BinaryExpression": 
-      case "LogicalExpression": 
+      case "BinaryExpression":
+      case "LogicalExpression":
         return [node.left, node.right];
-      case "CallExpression": 
+      case "CallExpression":
         return [node.callee].concat(node.arguments);
-      case "FunctionExpression": 
+      case "FunctionExpression":
         return node.params.concat([node.body]);
       case "LetExpression":
           return node.head.concat([node.body]);
@@ -280,7 +280,7 @@ var Ast = (function ()
         return [node.object, node.property];
       case "ObjectExpression":
         return node.properties;
-      case "ExpressionStatement": 
+      case "ExpressionStatement":
         return [node.expression];
       case "ThisExpression":
         return [];
@@ -296,7 +296,7 @@ var Ast = (function ()
           return [];
         }
         return [node.argument];
-      case "BreakStatement": 
+      case "BreakStatement":
         if (node.label === null)
         {
           return [];
@@ -304,18 +304,18 @@ var Ast = (function ()
         return [node.label];
       case "LabeledStatement":
         return [node.label, node.body];
-      case "IfStatement": 
+      case "IfStatement":
         if (node.alternate === null)
         {
           return [node.test, node.consequent];
         }
         return [node.test, node.consequent, node.alternate];
-      case "ConditionalExpression": 
+      case "ConditionalExpression":
         return [node.test, node.consequent, node.alternate];
       case "SwitchStatement":
         if (node.cases)
         {
-          return [node.discriminant].concat(node.cases.flatMap(children));        
+          return [node.discriminant].concat(node.cases.flatMap(children));
         }
         return [node.discriminant];
       case "SwitchCase":
@@ -324,15 +324,15 @@ var Ast = (function ()
           return [node.test].concat(node.consequent);
         }
         return node.consequent;
-      case "WhileStatement": 
+      case "WhileStatement":
         return [node.test, node.body];
-      case "DoWhileStatement": 
+      case "DoWhileStatement":
         return [node.body, node.test];
       case "ForStatement":
         return [node.init, node.test, node.update, node.body].filter(function (n) { return n !== null});
       case "FunctionDeclaration":
         return [node.id].concat(node.params).concat([node.body]);
-      case "VariableDeclaration": 
+      case "VariableDeclaration":
         return node.declarations;
       case "VariableDeclarator":
         if (node.init === null)
@@ -342,10 +342,10 @@ var Ast = (function ()
         return [node.id, node.init];
       case "Property":
         return [node.key, node.value];
-      case "Program": 
-      case "BlockStatement": 
+      case "Program":
+      case "BlockStatement":
         return node.body;
-      case "TryStatement": 
+      case "TryStatement":
         return [node.block].concat(node.handlers);
       case "CatchClause":
         return [node.param, node.body];
@@ -353,11 +353,11 @@ var Ast = (function ()
         return [node.argument];
       case "EmptyStatement":
         return [];
-      default: 
-        throw new Error("children: cannot handle " + node); 
+      default:
+        throw new Error("children: cannot handle " + node);
     }
   }
-  
+
   function descendants(n)
   {
     if (Array.isArray(n))
@@ -370,7 +370,7 @@ var Ast = (function ()
       return cs.concat(descendants(cs));
     }
   }
-  
+
   // depth-first
   function nodes(n)
   {
@@ -383,13 +383,13 @@ var Ast = (function ()
       return [n].concat(nodes(children(n)));
     }
   }
-  
+
   // debug
   module.printTree = function (n)
   {
     nodes(n).forEach(
       function (n)
-      { 
+      {
         var props = [];
         for (var name in n)
         {
@@ -402,43 +402,43 @@ var Ast = (function ()
         print("#" + n.tag + "\t" + n, props);
       });
   }
-  
-  
+
+
   var __nodeCounter__ = 0;
   function tagNode(node)
   {
-    node.tag = ++__nodeCounter__; 
+    node.tag = ++__nodeCounter__;
   }
-  
+
   //var __symCounter__ = 0;
   //function gensym(prefix)
   //{
-  //  return prefix + ++__symCounter__; 
+  //  return prefix + ++__symCounter__;
   //}
-  
+
   module.createAst =
     function (source, config)
   {
     function visitNode(node)
     {
-    
+
       function toString()
       {
         return nodeToString(this);
       }
-      
+
       function hashCode()
       {
         return this.tag;
       }
-  
+
       function nodify(x)
       {
         tagNode(x);
         x.toString = toString;
         x.hashCode = hashCode;
       }
-    
+
       function doVisit(node)
       {
         if (node === null)
@@ -448,10 +448,10 @@ var Ast = (function ()
         nodify(node);
         var cs = children(node);
         cs.forEach(function (child) { doVisit(child, node);});
-      }   
+      }
       doVisit(node);
     }
-    
+
     var ast = esprima.parse(source, {loc: (config ? config.loc : false)});
     if (config && config.resetTagCounter)
     {
@@ -460,7 +460,7 @@ var Ast = (function ()
     visitNode(ast);
     return ast;
   }
-  
+
   function expressionContext(ast)
   {
     if (ast.body.length !== 1)
@@ -473,7 +473,7 @@ var Ast = (function ()
     }
     return ast.body[0].expression;
   }
-  
+
   module.tagToNode = function (ast)
   {
     return function (tag)
@@ -483,10 +483,10 @@ var Ast = (function ()
       {
         return ns[0];
       }
-      throw new Error("for tag " + tag + " got " + ns);    
+      throw new Error("for tag " + tag + " got " + ns);
     }
   }
-  
+
   module.locToNode = function (line, col, ast)
   {
     function covers(n)
@@ -505,7 +505,7 @@ var Ast = (function ()
       }
       return n.loc.end.line >= line;
     }
-    
+
     function doIt(n)
     {
       if (covers(n))
@@ -516,7 +516,7 @@ var Ast = (function ()
       }
       return [];
     }
-    
+
     var ns = doIt(ast);
     if (ns.length === 1)
     {
@@ -524,14 +524,14 @@ var Ast = (function ()
     }
     throw new Error("for loc (" + line + ", " + col + ") got " + ns);
   }
-  
+
   function isChild(node, parent)
   {
     return children(parent).indexOf(node) > -1;
   }
-  
+
   // createFromChildren
-  
+
   function parent(node, ast)
   {
     var cs = children(ast);
@@ -548,7 +548,7 @@ var Ast = (function ()
     }
     return false;
   }
-  
+
   function isDeclarationIdentifier(n, ast)
   {
     if (isIdentifier(n))
@@ -558,7 +558,7 @@ var Ast = (function ()
     }
     return false;
   }
-  
+
   function isVarDeclarationIdentifier(n, ast)
   {
     if (isIdentifier(n))
@@ -573,7 +573,7 @@ var Ast = (function ()
     }
     return false;
   }
-  
+
   function isConstDeclarationIdentifier(n, ast)
   {
     if (isIdentifier(n))
@@ -587,7 +587,7 @@ var Ast = (function ()
     }
     return false;
   }
-  
+
   function isAssignedIdentifier(n, ast)
   {
     if (isIdentifier(n))
@@ -600,7 +600,7 @@ var Ast = (function ()
     }
     return false;
   }
-  
+
   module.isReferenceIdentifier = isReferenceIdentifier;
   function isReferenceIdentifier(n, ast)
   {
@@ -615,7 +615,7 @@ var Ast = (function ()
     }
     return false;
   }
-  
+
   function enclosingBlock(node, ast)
   {
     var p = parent(node, ast);
@@ -629,7 +629,7 @@ var Ast = (function ()
     }
     return false;
   }
-  
+
   function enclosingFunction(node, ast)
   {
     var p = parent(node, ast);
@@ -643,7 +643,7 @@ var Ast = (function ()
     }
     return false;
   }
-  
+
   module.scopeInfo =
     function (nodeWithBody)
     {
@@ -660,7 +660,7 @@ var Ast = (function ()
       {
         return helper(nodeWithBody);
       }
-      
+
       function helper(node)
       {
         if (node === null || isFunctionExpression(node))
@@ -686,7 +686,7 @@ var Ast = (function ()
         {
           if (isIdentifier(node.left))
           {
-            return helper(node.right).addLast({name:node.left.name, node:node.left, type:"A"});            
+            return helper(node.right).addLast({name:node.left.name, node:node.left, type:"A"});
           }
         }
         else if (isIdentifier(node))
@@ -701,7 +701,7 @@ var Ast = (function ()
           }
         }
         var cs = children(node);
-        return cs.flatMap(helper);          
+        return cs.flatMap(helper);
       }
     }
 
@@ -728,17 +728,17 @@ var Ast = (function ()
             vars.forEach(function (v) { if (v.name === name) {exists = true;}});
             if (!exists)
             {
-              funs.forEach(function (f) { if (f.name === name) {exists = true;}});          
+              funs.forEach(function (f) { if (f.name === name) {exists = true;}});
             }
             if (!exists)
             {
               vars.push(item);
-            }        
+            }
           }
         });
       return {funs: funs, vars: vars, scopeInfo: scopeInfo};
     }
-  
+
   module.nodes = nodes;
-  return module;  
+  return module;
 })()

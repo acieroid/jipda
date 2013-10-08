@@ -17,14 +17,14 @@ function b()
   load("../../ast/scheme.js");
   load("benv.js");
   load("sipda.js");
-  
+
 //  load("test/astTests.js");
 //  load("test/benvTests.js");
   load("test/concreteTests.js");
   load("test/sipdaTests.js");
-//  load("test/jsAnalysisTests.js");  
+//  load("test/jsAnalysisTests.js");
 //  load("test/coverageTests.js");
-//  load("test/latticeTests.js");  
+//  load("test/latticeTests.js");
 }
 
 b();

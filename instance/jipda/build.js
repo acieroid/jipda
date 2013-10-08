@@ -22,14 +22,14 @@ function b()
   load("../../analysis/analysis.js");
   load("defaultBenv.js");
   load("jipda.js");
-  
+
 //  load("test/astTests.js");
 //  load("test/benvTests.js");
   load("test/concreteTests.js");
   load("test/jipdaTests.js");
-  load("test/dependenceTests.js");  
+  load("test/dependenceTests.js");
 //  load("test/coverageTests.js");
-//  load("test/latticeTests.js");  
+//  load("test/latticeTests.js");
 }
 
 b();

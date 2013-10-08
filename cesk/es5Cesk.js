@@ -6,14 +6,14 @@ function es5Cesk(cc)
   var b = cc.b || new DefaultBenv();
   // primitive lattice
   var p = cc.p;
-  
+
   assertDefinedNotNull(a);
 //  assertDefinedNotNull(b);
   assertDefinedNotNull(p);
 
   // lattice (primitives + addresses)
   var l = new JipdaLattice(p); // TODO this will become param
-  
+
   // install constants
   var L_UNDEFINED = l.abst1(undefined);
   var L_NULL = l.abst1(null);
@@ -33,7 +33,7 @@ function es5Cesk(cc)
   var P_NUMBER = p.NUMBER;
   var P_STRING = p.STRING;
   var P_DEFINED = P_NULL.join(P_TRUE).join(P_FALSE).join(P_NUMBER).join(P_STRING);
-  
+
   var P_RETVAL = p.abst1("!retVal!");
 
   // install global pointers and refs
@@ -47,7 +47,7 @@ function es5Cesk(cc)
   var stringProtoRef = l.abst1(stringPa);
   var arrayPa = new ContextAddr("Array.prototype", 0);
   var arrayProtoRef = l.abst1(arrayPa);
-  
+
   function createEnvironment(parenta)
   {
     var benv = b.createEnvironment(parenta);
@@ -85,13 +85,13 @@ function es5Cesk(cc)
     var benv = b.createFunction(new BenvPrimitiveCall(applyFunction), functionProtoRef);
     return benv;
   }
-  
+
   function registerProperty(object, propertyName, value)
   {
     object = object.add(p.abst1(propertyName), value);
-    return object;      
+    return object;
   }
-  
+
   // create global object and initial store
   var global = createObject(objectProtoRef);
   var store = new Store();
@@ -99,21 +99,21 @@ function es5Cesk(cc)
   function registerPrimitiveFunction(object, objectAddress, propertyName, fun)
   {
     var primFunObject = createPrimitive(fun);
-    var primFunObjectAddress = new ContextAddr(objectAddress, "<" + propertyName + ">"); 
-    store = store.allocAval(primFunObjectAddress, primFunObject);    
+    var primFunObjectAddress = new ContextAddr(objectAddress, "<" + propertyName + ">");
+    store = store.allocAval(primFunObjectAddress, primFunObject);
     return registerProperty(object, propertyName, l.abst1(primFunObjectAddress));
   }
-  
+
   // BEGIN OBJECT
   var objectP = createObject(L_NULL);
   objectP.toString = function () { return "<Object.prototype>"; }; // debug
   var objecta = new ContextAddr("<Object>", 0);
   objectP = registerProperty(objectP, "constructor", l.abst1(objecta));
-  
+
   var object = createPrimitive(objectConstructor);
   object = object.add(P_PROTOTYPE, objectProtoRef);//was objectProtoRef
   global = global.add(p.abst1("Object"), l.abst1(objecta));
-  
+
 //  object = registerPrimitiveFunction(object, objecta, "getPrototypeOf", objectGetPrototypeOf);
 //  object = registerPrimitiveFunction(object, objecta, "create", objectCreate);
 
@@ -121,7 +121,7 @@ function es5Cesk(cc)
   store = store.allocAval(objectPa, objectP);
   // END OBJECT
 
-      
+
   // BEGIN FUNCTION
   var functionP = createObject(objectProtoRef);
   functionP.toString = function () { return "<Function.prototype>"; }; // debug
@@ -133,8 +133,8 @@ function es5Cesk(cc)
   store = store.allocAval(functiona, fun);
 
   store = store.allocAval(functionPa, functionP);
-  // END FUNCTION 
-          
+  // END FUNCTION
+
   // BEGIN STRING
   var stringP = createObject(objectProtoRef);
   stringP.toString = function () { return "<String.prototype>"; }; // debug
@@ -147,8 +147,8 @@ function es5Cesk(cc)
   store = store.allocAval(stringa, string);
 
   store = store.allocAval(stringPa, stringP);
-  // END STRING 
-          
+  // END STRING
+
   // BEGIN ARRAY
 //  var arrayP = createObject(objectProtoRef);
 //  arrayP.toString = function () { return "<Array.prototype>"; }; // debug
@@ -159,7 +159,7 @@ function es5Cesk(cc)
 //  var arrayNa = new ContextAddr("Array", 0);
 //  store = store.allocAval(arraya, array);
 //  global = global.add(p.abst1("Array"), l.abst1(arraya));
-//  
+//
 //  arrayP = registerPrimitiveFunction(arrayP, arrayPa, "concat", arrayConcat);
 //  arrayP = registerPrimitiveFunction(arrayP, arrayPa, "push", arrayPush);
 //  arrayP = registerPrimitiveFunction(arrayP, arrayPa, "map", arrayMap);
@@ -167,7 +167,7 @@ function es5Cesk(cc)
 //  arrayP = registerPrimitiveFunction(arrayP, arrayPa, "filter", arrayFilter);
 //  store = store.allocAval(arrayPa, arrayP);
   // END ARRAY
-  
+
   // BEGIN MATH
 //  var math = createObject(objectProtoRef);
 //  math = registerPrimitiveFunction(math, globala, "abs", mathAbs);
@@ -182,7 +182,7 @@ function es5Cesk(cc)
 //  store = store.allocAval(matha, math);
 //  global = global.add(p.abst1("Math"), l.abst1(matha));
   // END MATH
-  
+
   // BEGIN GLOBAL
   global = global.add(P_THIS, globalRef); // global "this" address
   // ECMA 15.1.1 value properties of the global object (no "null", ...)
@@ -195,10 +195,10 @@ function es5Cesk(cc)
 //  global = registerPrimitiveFunction(global, globala, "$join", $join);
 //  global = registerPrimitiveFunction(global, globala, "print", _print);
   // end specific interpreter functions
-  
+
   store = store.allocAval(globala, global);
   // END GLOBAL
-  
+
   // BEGIN PRIMITIVES
   function objectConstructor(application, operands, objectAddress, stack, benva, store, time)
   {
@@ -207,8 +207,8 @@ function es5Cesk(cc)
     var obj = createObject(objectProtoRef);
     store = allocAval(objectAddress, obj, stack, store);
     return kont[0].apply(stack2.addFirst(l.abst1(objectAddress)), store, time);
-  }    
-  
+  }
+
   function objectCreate(application, operands, objectAddress, stack, benva, store, time)
   {
     if (operands.length !== 1)
@@ -221,8 +221,8 @@ function es5Cesk(cc)
     var address = a.object(application, time);
     store = allocAval(address, obj, stack, store);
     return kont[0].apply(stack2.addFirst(l.abst1(address)), store, time);
-  }    
-  
+  }
+
   function objectGetPrototypeOf(application, operands, objectAddress, stack, benva, store, time)
   {
     var cont = stack[0];
@@ -235,7 +235,7 @@ function es5Cesk(cc)
       return kont[0].apply(stack2.addFirst(object.Prototype), store, time);
     }
     throw new Error("TODO");
-  }    
+  }
 
   function stringConstructor(application, operands, ths, stack, benva, store, time)
   {
@@ -248,29 +248,29 @@ function es5Cesk(cc)
 
       if (operands.length === 0)
       {
-        var stringBenv = createString(p.abst1("")); // TODO constant 
+        var stringBenv = createString(p.abst1("")); // TODO constant
         var stringAddress = a.string(application, time);
         stringBenv = stringBenv.add(P_LENGTH, L_0);
         store = allocAval(stringAddress, stringBenv, stack, store);
         return kont[0].apply(stack2.addFirst(l.abst1(stringAddress)), store, time);
       }
-      
+
       var prim = operands[0].user.ToString(); // TODO ToString iso. project
-      var stringBenv = createString(prim); 
+      var stringBenv = createString(prim);
       var stringAddress = a.array(application, time); // TODO this is not an array(!)
       stringBenv = stringBenv.add(P_LENGTH, new JipdaValue(prim.length(), []));
       store = allocAval(stringAddress, stringBenv, stack, store);
-      return kont[0].apply(stack2.addFirst(l.abst1(stringAddress)), store, time);        
+      return kont[0].apply(stack2.addFirst(l.abst1(stringAddress)), store, time);
     }
     if (operands.length === 0)
     {
       var cont = stack[0];
       var stack2 = stack.slice(1);
-      return kont[0].apply(stack2.addFirst(l.abst1("")), store, time); // TODO constant  
+      return kont[0].apply(stack2.addFirst(l.abst1("")), store, time); // TODO constant
     }
     return ToString(application, stack.addFirst(operands[0]), benva, store, time);
-  }    
-      
+  }
+
   function arrayConstructor(application, operands, ths, stack, benva, store, time)
   {
     var cont = stack[0];
@@ -289,15 +289,15 @@ function es5Cesk(cc)
     arrayBenv = arrayBenv.add(P_LENGTH, l);
     store = allocAval(arrayAddress, arrayBenv, stack, store);
     return kont[0].apply(stack2.addFirst(l.abst1(arrayAddress)), store, time);
-  }    
-  
+  }
+
   function arrayPush(application, operands, objectAddress, stack, benva, store, time)
   {
     var cont = stack[0];
     var stack2 = stack.slice(1);
-   
+
     var arg0aa = operands[0];
-                  
+
     var receiver = lookupAval(objectAddress, stack, store);
     var lreceiver = receiver.lookup(l.U_LENGTH);
     if (lreceiver === BOT)
@@ -320,15 +320,15 @@ function es5Cesk(cc)
       var newLength = new JipdaValue(newLengthu, []);
       receiver = receiver.add(l.U_LENGTH, newLength);
       store = sideEffectAval(objectAddress, receiver, stack, store);
-      return kont[0].apply(stack2.addFirst(newLength), store, time);                                                                                  
+      return kont[0].apply(stack2.addFirst(newLength), store, time);
     }
   }
-  
+
   function arrayConcat(application, operands, objectAddress, stack, benva, store, time)
   {
     var cont = stack[0];
     var stack2 = stack.slice(1);
-   
+
     var arg0aa = operands[0];
 
     var receiver = lookupAval(objectAddress, stack, store);
@@ -341,23 +341,23 @@ function es5Cesk(cc)
     return arrayCopy(receiver, l.U_0, result, l.U_0, lreceiveru, stack, store, c,
       function (result, index, store)
       {
-        return arrayCopy(arg0, P_0, result, index, larg0u, stack, store, c, 
+        return arrayCopy(arg0, P_0, result, index, larg0u, stack, store, c,
           function (result, index, store)
           {
             result = result.add(l.U_LENGTH, new JipdaValue(index, []));
             store = allocAval(resulta, result, stack, store);
-            return kont[0].apply(stack2.addFirst(l.abst1(resulta)), store, time);                                                                                  
+            return kont[0].apply(stack2.addFirst(l.abst1(resulta)), store, time);
           });
       });
-  } 
-  
+  }
+
   function arrayMap(application, operands, thisa, stack, benva, store, time)
   {
     // TODO ToObject(thisa)
     // TODO best way to solve this?
     var receiver = lookupAval(thisa, stack, store);
     var lenValue = receiver.lookup(P_LENGTH);
-    
+
     function arrayMapToUInt32Cont()
     {
       return new Cont("arrayMapToUInt32", application, null, benva,
@@ -365,12 +365,12 @@ function es5Cesk(cc)
         {
           var lenPrim = stack[0].user;
           var stack2 = stack.slice(1);
-          
+
           var arr = createArray();
           var arrAddr = a.array(application, time);
           store = store.allocAval(arrAddr, arr, stack, store);
-          
-          
+
+
           function arrayMapLoop(k, arr, stack, store, time)
           {
             while (p.isTrue(p.lt(k, lenPrim)))
@@ -378,7 +378,7 @@ function es5Cesk(cc)
               var indexValue = receiver.lookup(k.ToString());
               if (indexValue !== BOT && !indexValue.equals(L_UNDEFINED)) // TODO project defined/undefined
               {
-                return applyProc(application, [l.abst1(thisa), new JipdaValue(k, []), indexValue, operands[0], operands[1] || GLOBALA, arrayMapCont(k, arr)].concat(stack), benva, store, time, c, 3); // TODO this addresses          
+                return applyProc(application, [l.abst1(thisa), new JipdaValue(k, []), indexValue, operands[0], operands[1] || GLOBALA, arrayMapCont(k, arr)].concat(stack), benva, store, time, c, 3); // TODO this addresses
               }
               k = p.add(k, P_1);
             }
@@ -390,9 +390,9 @@ function es5Cesk(cc)
             //stack[2] this    (GC)
             var cont = stack[3];
             var stack2 = stack.slice(4);
-            return kont[0].apply(stack2.addFirst(jarr), store, time);            
+            return kont[0].apply(stack2.addFirst(jarr), store, time);
           }
-          
+
           function arrayMapCont(k, arr)
           {
             return new Cont("arrayMap", application, k, benva,
@@ -406,24 +406,24 @@ function es5Cesk(cc)
                 return arrayMapLoop(p.add(k, P_1), arr, stack2, store, time);
               });
           }
-          
+
           var jarr = l.abst1(arrAddr);
-          return arrayMapLoop(P_0, arr, stack2.addFirst(jarr), store, time);            
+          return arrayMapLoop(P_0, arr, stack2.addFirst(jarr), store, time);
         });
     }
-    
-    // add thisAddr and fAddr to rootset 
+
+    // add thisAddr and fAddr to rootset
     var stack2 = stack.addFirst(thisa).addFirst(operands[0]);
     return ToUInt32(lenValue, application, stack2.addFirst(arrayMapToUInt32Cont()), benva, store, time);
   }
-  
+
   function arrayReduce(application, operands, thisa, stack, benva, store, time)
   {
     // TODO ToObject(thisa)
     // TODO best way to solve this?
     var receiver = lookupAval(thisa, stack, store);
     var lenValue = receiver.lookup(P_LENGTH);
-    
+
     function arrayReduceToUInt32Cont()
     {
       return new Cont("arrayReduceToUInt32", application, null, benva,
@@ -450,9 +450,9 @@ function es5Cesk(cc)
                 return arrayReduceLoop(p.add(k, P_1), indexValue, stack, store, time);
               }
               k = p.add(k, P_1);
-            }              
+            }
           }
-          
+
           function arrayReduceLoop(k, result, stack, store, time)
           {
             while (p.isTrue(p.lt(k, lenPrim)))
@@ -461,7 +461,7 @@ function es5Cesk(cc)
               if (indexValue !== BOT)
               {
                 var stack2 = stack.slice(1);
-                return applyProc(application, [l.abst1(thisa), new JipdaValue(k, []), indexValue, result, operands[0], l.abst1(thisa), arrayReduceCont(k)].concat(stack2), benva, store, time, c, 4); // TODO this addresses          
+                return applyProc(application, [l.abst1(thisa), new JipdaValue(k, []), indexValue, result, operands[0], l.abst1(thisa), arrayReduceCont(k)].concat(stack2), benva, store, time, c, 4); // TODO this addresses
               }
               k = p.add(k, P_1);
             }
@@ -470,9 +470,9 @@ function es5Cesk(cc)
             //stack[2] GC
             var cont = stack[3];
             var stack2 = stack.slice(4);
-            return kont[0].apply(stack2.addFirst(result), store, time);            
+            return kont[0].apply(stack2.addFirst(result), store, time);
           }
-          
+
           function arrayReduceCont(k)
           {
             return new Cont("arrayReduce", application, k, benva,
@@ -484,7 +484,7 @@ function es5Cesk(cc)
           }
         });
     }
-    
+
     // add receiver, reducer to rootset
     var stack2 = stack.addFirst(thisa).addFirst(operands[0]);
     return ToUInt32(lenValue, application, stack2.addFirst(arrayReduceToUInt32Cont()), benva, store, time);
@@ -496,7 +496,7 @@ function es5Cesk(cc)
     // TODO best way to solve this?
     var receiver = lookupAval(thisa, stack, store);
     var lenValue = receiver.lookup(P_LENGTH);
-    
+
     function arrayFilterToUInt32Cont() // TODO numAllocedProperties is concrete integer (used as index), k is abstract???
     { // but numAP is also used to slice stuff of stack... make two counters: concrete and abst?
       // Points against: every JS conc value should be abstractable
@@ -505,12 +505,12 @@ function es5Cesk(cc)
         {
           var lenPrim = stack[0].user;
           var stack2 = stack.slice(1);
-          
+
           var arr = createArray();
           var arrAddr = a.array(application, time);
           var jarr = l.abst1(arrAddr);
           store = allocAval(arrAddr, arr, stack, store);
-          
+
           function arrayFilterLoop(k, numAllocedProperties, arr, stack, store, time)
           {
             while (p.isTrue(p.lt(k, lenPrim)))
@@ -518,11 +518,11 @@ function es5Cesk(cc)
               var indexValue = receiver.lookup(k.ToString());
               if (indexValue !== BOT && !indexValue.equals(L_UNDEFINED)) // TODO project defined/undefined
               {
-                return applyProc(application, [indexValue, new JipdaValue(k, []), indexValue, operands[0], operands[1] || GLOBALA, arrayFilterCont(k, indexValue, numAllocedProperties, arr)].concat(stack), benva, store, time, c, 3); // TODO this addresses          
+                return applyProc(application, [indexValue, new JipdaValue(k, []), indexValue, operands[0], operands[1] || GLOBALA, arrayFilterCont(k, indexValue, numAllocedProperties, arr)].concat(stack), benva, store, time, c, 3); // TODO this addresses
               }
               k = p.add(k, l.U_1);
             }
-            
+
             arr = arr.add(P_LENGTH, l.abst1(numAllocedProperties));
             store = sideEffectAval(arrAddr, arr, stack, store);
             //stack[0] jarr    (GC)
@@ -530,9 +530,9 @@ function es5Cesk(cc)
             //stack[2] this    (GC)
             var cont = stack[3];
             var stack2 = stack.slice(4);
-            return kont[0].apply(stack2.addFirst(jarr), store, time);            
+            return kont[0].apply(stack2.addFirst(jarr), store, time);
           }
-          
+
           function arrayFilterCont(k, indexValue, numAllocedProperties, arr)
           {
             return new Cont("arrayFilter", application, k, benva,
@@ -546,7 +546,7 @@ function es5Cesk(cc)
                   arr = arr.add(propName, indexValue);
                   // side-effect now for GC
                   store = sideEffectAval(arrAddr, arr, stack, store);
-                  return arrayFilterLoop(p.add(k, P_1), numAllocedProperties + 1, arr, stack2, store, time);                    
+                  return arrayFilterLoop(p.add(k, P_1), numAllocedProperties + 1, arr, stack2, store, time);
                 }
                 if (p.isFalse(value))
                 {
@@ -559,7 +559,7 @@ function es5Cesk(cc)
                             arr = arr.add(propName, indexValue);
                             // side-effect now for GC
                             store = sideEffectAval(arrAddr, arr, stack, store);
-                            return arrayFilterLoop(p.add(k, P_1), numAllocedProperties + 1, arr, stack2, store, time);                    
+                            return arrayFilterLoop(p.add(k, P_1), numAllocedProperties + 1, arr, stack2, store, time);
                           }),
                         new Task("Array.prototype.filter false",
                           function ()
@@ -568,15 +568,15 @@ function es5Cesk(cc)
                           })];
               });
           }
-          return arrayFilterLoop(l.U_0, 0, arr, stack2.addFirst(jarr), store, time);            
+          return arrayFilterLoop(l.U_0, 0, arr, stack2.addFirst(jarr), store, time);
         });
     }
-    
+
     // add receiver, filter function to rootset
     var stack2 = stack.addFirst(thisa).addFirst(operands[0]);
     return ToUInt32(lenValue, application, stack2.addFirst(arrayFilterToUInt32Cont()), benva, store, time);
-  }    
-  
+  }
+
   function mathSqrt(application, operands, objectAddress, stack, benva, store, time)
   {
     var cont = stack[0];
@@ -586,7 +586,7 @@ function es5Cesk(cc)
     var j = new JipdaValue(r, []);
     return kont[0].apply(stack2.addFirst(j), store, time);
   }
-  
+
   function mathAbs(application, operands, objectAddress, stack, benva, store, time)
   {
     var cont = stack[0];
@@ -596,7 +596,7 @@ function es5Cesk(cc)
     var j = new JipdaValue(r, []);
     return kont[0].apply(stack2.addFirst(j), store, time);
   }
-  
+
   function mathRound(application, operands, objectAddress, stack, benva, store, time)
   {
     var cont = stack[0];
@@ -606,7 +606,7 @@ function es5Cesk(cc)
     var j = new JipdaValue(r, []);
     return kont[0].apply(stack2.addFirst(j), store, time);
   }
-  
+
   function mathSin(application, operands, objectAddress, stack, benva, store, time)
   {
     var cont = stack[0];
@@ -616,7 +616,7 @@ function es5Cesk(cc)
     var j = new JipdaValue(r, []);
     return kont[0].apply(stack2.addFirst(j), store, time);
   }
-  
+
   function mathCos(application, operands, objectAddress, stack, benva, store, time)
   {
     var cont = stack[0];
@@ -626,7 +626,7 @@ function es5Cesk(cc)
     var j = new JipdaValue(r, []);
     return kont[0].apply(stack2.addFirst(j), store, time);
   }
-  
+
   function mathMax(application, operands, objectAddress, stack, benva, store, time)
   {
     var cont = stack[0];
@@ -637,12 +637,12 @@ function es5Cesk(cc)
       var u2 = toUserNumber(operands[1], store);
       var r = p.max(u1, u2);
       var j = new JipdaValue(r, []);
-      return kont[0].apply(stack2.addFirst(j), store, time);        
+      return kont[0].apply(stack2.addFirst(j), store, time);
     }
     throw new Error("NYI");
   }
-  
-  // deterministic random from Octane benchmarks 
+
+  // deterministic random from Octane benchmarks
   var seed = 49734321;
   function mathRandom(application, operands, objectAddress, stack, benva, store, time)
   {
@@ -659,7 +659,7 @@ function es5Cesk(cc)
     var j = new JipdaValue(r, []);
     return kont[0].apply(stack2.addFirst(j), store, time);
   }
-  
+
   function $meta(application, operands, objectAddress, stack, benva, store, time)
   {
     var cont = stack[0];
@@ -668,32 +668,32 @@ function es5Cesk(cc)
     var value = l.abst1(eval(str));
     return kont[0].apply(stack2.addFirst(value), store, time);
   }
-  
+
   function $join(application, operands, thisa, stack, benva, store, time)
   {
     var cont = stack[0];
     var stack2 = stack.slice(1);
     var value = operands.reduce(Lattice.join, BOT);
     return kont[0].apply(stack2.addFirst(value), store, time);
-  }    
-  
+  }
+
   function $toString(application, operands, thisa, stack, benva, store, time)
   {
     var cont = stack[0];
     var stack2 = stack.slice(1);
     var value = operands.reduce(Lattice.join, BOT);
     return kont[0].apply(stack2.addFirst(value), store, time);
-  }    
-  
+  }
+
   function _print(application, operands, objectAddress, stack, benva, store, time)
   {
     var cont = stack[0];
     var stack2 = stack.slice(1);
     print.apply(null, operands);
     return kont[0].apply(stack2.addFirst(L_UNDEFINED), store, time);
-  }    
+  }
   // END PRIMITIVES
-  
+
   // BEGIN HELPERS
   function arrayCopy(srcBenv, srcPos, dstBenv, dstPos, l, stack, store, c, fcont)
   {
@@ -708,7 +708,7 @@ function es5Cesk(cc)
     return fcont(dstBenv, p.add(i, dstPos), store);
   }
   // END HELPERS
-  
+
   function BenvPrimitiveCall(applyFunction)
   {
     this.applyFunction = applyFunction;
@@ -719,7 +719,7 @@ function es5Cesk(cc)
     {
       return "<BenvPrimitiveCall>";
     }
-  
+
   BenvPrimitiveCall.prototype.equals =
     function (other)
     {
@@ -733,13 +733,13 @@ function es5Cesk(cc)
       }
       return this.applyFunction === other.applyFunction; // this case needed? (finite number of fixed prims)
     }
-  
+
   BenvPrimitiveCall.prototype.addresses =
     function ()
     {
       return [];
-    } 
-  
+    }
+
   function BenvClosureCall(node, scope)
   {
     this.node = node;
@@ -778,7 +778,7 @@ function es5Cesk(cc)
       var result = 1;
       result = prime * result + this.node.hashCode();
       result = prime * result + this.scope.hashCode();
-      return result;      
+      return result;
     }
 
 
@@ -796,7 +796,7 @@ function es5Cesk(cc)
     {
       return [this.scope];
     }
-  
+
 
 
   function EvalState(node, benva, store)
@@ -820,7 +820,7 @@ function es5Cesk(cc)
     function (x)
     {
       return this.type === x.type
-        && this.node === x.node 
+        && this.node === x.node
         && Eq.equals(this.benva, x.benva)
         && Eq.equals(this.store, x.store);
     }
@@ -848,10 +848,10 @@ function es5Cesk(cc)
     {
       return new EvalState(this.node, this.benva, store);
     }
-  
+
   function KontState(frame, value, store)
   {
-    this.type = "kont";  
+    this.type = "kont";
     this.frame = frame;
     this.value = value;
     this.store = store;
@@ -860,8 +860,8 @@ function es5Cesk(cc)
     function (x)
     {
       return this.type === x.type
-        && Eq.equals(this.frame, x.frame) 
-        && Eq.equals(this.value, x.value) 
+        && Eq.equals(this.frame, x.frame)
+        && Eq.equals(this.value, x.value)
         && Eq.equals(this.store, x.store);
     }
   KontState.prototype.hashCode =
@@ -898,8 +898,8 @@ function es5Cesk(cc)
     {
       return new KontState(this.frame, this.value, store);
     }
-  
-  
+
+
   function CallState(node, callable, operandValues, thisa, benva, store)
   {
     this.type = "call";
@@ -960,7 +960,7 @@ function es5Cesk(cc)
     {
       return new CallState(this.node, this.callable, this.operandValues, this.thisa, this.benva, this.store);
     }
-  
+
   function ReturnState(node, returna, store, frame)
   {
     this.type = "return";
@@ -969,7 +969,7 @@ function es5Cesk(cc)
     this.store = store;
     this.frame = frame;
   }
-  
+
   ReturnState.returnMarker = {isMarker:true};
   ReturnState.returnMarker.equals = function (x) {return x === ReturnState.returnMarker};
   ReturnState.returnMarker.hashCode = function () {return 5};
@@ -977,15 +977,15 @@ function es5Cesk(cc)
   ReturnState.returnMarker.apply = function () {throw new Error("cannot apply returnMarker")};
   ReturnState.returnMarker.toString = function () {return "ret"};
   ReturnState.returnMarker.nice = function () {return "ret"};
-  
+
   ReturnState.prototype.equals =
     function (x)
     {
-      return this.type === x.type 
-        && this.node === x.node 
-        && Eq.equals(this.returna, x.returna) 
-        && Eq.equals(this.store, x.store) 
-        && Eq.equals(this.frame, x.frame); 
+      return this.type === x.type
+        && this.node === x.node
+        && Eq.equals(this.returna, x.returna)
+        && Eq.equals(this.store, x.store)
+        && Eq.equals(this.frame, x.frame);
     }
   ReturnState.prototype.hashCode =
     function ()
@@ -1023,7 +1023,7 @@ function es5Cesk(cc)
     {
       return new ReturnState(this.node, this.returna, this.store, this.frame);
     }
-  
+
   function StatementListKont(node, i, benva, lastValue)
   {
     this.node = node;
@@ -1073,7 +1073,7 @@ function es5Cesk(cc)
       var benva = this.benva;
       var i = this.i;
       var lastValue = this.lastValue;
-      
+
       // keep track of last value-producing statement (ECMA 12.1 Block, 14 Program)
       var newLastValue;
       var undefProj = value.meet(L_UNDEFINED);
@@ -1087,9 +1087,9 @@ function es5Cesk(cc)
       }
       else // value > undefined
       {
-        newLastValue = l.product(value.prim.meet(P_DEFINED), value.as).join(lastValue); 
+        newLastValue = l.product(value.prim.meet(P_DEFINED), value.as).join(lastValue);
       }
-      
+
       var nodes = node.body;
       if (i === nodes.length)
       {
@@ -1098,7 +1098,7 @@ function es5Cesk(cc)
       var frame = new StatementListKont(node, i + 1, benva, newLastValue);
       return kont.push(frame, new EvalState(nodes[i], benva, store));
     }
-  
+
   function VariableDeclarationKont(node, i, benva)
   {
     this.node = node;
@@ -1144,7 +1144,7 @@ function es5Cesk(cc)
       var node = this.node;
       var benva = this.benva;
       var i = this.i;
-      
+
       var nodes = node.declarations;
       if (i === nodes.length)
       {
@@ -1153,7 +1153,7 @@ function es5Cesk(cc)
       var frame = new VariableDeclarationKont(node, i + 1, benva);
       return kont.push(frame, new EvalState(nodes[i], benva, store));
     }
-  
+
   function VariableDeclaratorKont(node, benva)
   {
     this.node = node;
@@ -1200,7 +1200,7 @@ function es5Cesk(cc)
       store = store.updateAval(benva, benv); // side-effect
       return kont.pop(function (frame) {return new KontState(frame, L_UNDEFINED, store)});
     }
-  
+
   function LeftKont(node, benva)
   {
     this.node = node;
@@ -1245,7 +1245,7 @@ function es5Cesk(cc)
       var frame = new RightKont(node, benva, leftValue);
       return kont.push(frame, new EvalState(node.right, benva, store));
     }
-  
+
   function RightKont(node, benva, leftValue)
   {
     this.node = node;
@@ -1302,7 +1302,7 @@ function es5Cesk(cc)
       }
       throw new Error("TODO");
     }
-  
+
   function AssignIdentifierKont(node, benva)
   {
     this.node = node;
@@ -1312,7 +1312,7 @@ function es5Cesk(cc)
     function (x)
     {
       return x instanceof AssignIdentifierKont
-        && this.node === x.node 
+        && this.node === x.node
         && Eq.equals(this.benva, x.benva);
     }
   AssignIdentifierKont.prototype.hashCode =
@@ -1348,7 +1348,7 @@ function es5Cesk(cc)
       store = doScopeSet(p.abst1(id.name), value, benva, store);
       return kont.pop(function (frame) {return new KontState(frame, value, store)});
     }
-  
+
   function OperatorKont(node, benva)
   {
     this.node = node;
@@ -1391,7 +1391,7 @@ function es5Cesk(cc)
       var node = this.node;
       var benva = this.benva;
       var operands = node.arguments;
-  
+
       if (operands.length === 0)
       {
         return applyProc(node, operatorValue, [], globalRef, benva, store, kont);
@@ -1399,25 +1399,25 @@ function es5Cesk(cc)
       var frame = new OperandsKont(node, 1, benva, operatorValue, [], globalRef);
       return kont.push(frame, new EvalState(operands[0], benva, store));
     }
-  
+
   function OperandsKont(node, i, benva, operatorValue, operandValues, thisValue)
   {
     this.node = node;
     this.i = i;
     this.benva = benva;
-    this.operatorValue = operatorValue; 
-    this.operandValues = operandValues; 
+    this.operatorValue = operatorValue;
+    this.operandValues = operandValues;
     this.thisValue = thisValue;
   }
   OperandsKont.prototype.equals =
     function (x)
     {
       return x instanceof OperandsKont
-        && this.node === x.node 
-        && this.i === x.i 
-        && Eq.equals(this.benva, x.benva) 
-        && Eq.equals(this.operatorValue, x.operatorValue) 
-        && Eq.equals(this.operandValues, x.operandValues) 
+        && this.node === x.node
+        && this.i === x.i
+        && Eq.equals(this.benva, x.benva)
+        && Eq.equals(this.operatorValue, x.operatorValue)
+        && Eq.equals(this.operandValues, x.operandValues)
         && Eq.equals(this.thisValue, x.thisValue);
     }
   OperandsKont.prototype.hashCode =
@@ -1461,7 +1461,7 @@ function es5Cesk(cc)
       var operandValues = this.operandValues;
       var thisValue = this.thisValue;
       var operands = node.arguments;
-  
+
       if (i === operands.length)
       {
         return applyProc(node, operatorValue, operandValues.addLast(operandValue), thisValue, benva, store, kont);
@@ -1469,7 +1469,7 @@ function es5Cesk(cc)
       var frame = new OperandsKont(node, i + 1, benva, operatorValue, operandValues.addLast(operandValue), thisValue);
       return kont.push(frame, new EvalState(operands[i], benva, store));
     }
-  
+
   function BodyKont(node, i, benva)
   {
     this.node = node;
@@ -1515,7 +1515,7 @@ function es5Cesk(cc)
       var node = this.node;
       var benva = this.benva;
       var i = this.i;
-      
+
       var nodes = node.body;
       if (i === nodes.length)
       {
@@ -1524,7 +1524,7 @@ function es5Cesk(cc)
       var frame = new BodyKont(node, i + 1, benva);
       return kont.push(frame, new EvalState(nodes[i], benva, store));
     }
-  
+
   function ReturnKont(node, benva)
   {
     this.node = node;
@@ -1534,7 +1534,7 @@ function es5Cesk(cc)
     function (x)
     {
       return x instanceof ReturnKont
-        && this.node === x.node 
+        && this.node === x.node
         && Eq.equals(this.benva, x.benva);
     }
   ReturnKont.prototype.hashCode =
@@ -1571,7 +1571,7 @@ function es5Cesk(cc)
       store = store.updateAval(benva, benv);
       return kont.pop(function (frame) {return new ReturnState(node, benva, store, frame)});
     }
-  
+
   function IfKont(node, benva)
   {
     this.node = node;
@@ -1581,7 +1581,7 @@ function es5Cesk(cc)
     function (x)
     {
       return x instanceof IfKont
-        && this.node === x.node 
+        && this.node === x.node
         && Eq.equals(this.benva, x.benva);
     }
   IfKont.prototype.hashCode =
@@ -1612,7 +1612,7 @@ function es5Cesk(cc)
     function (conditionValue, store, kont)
     {
       var node = this.node;
-      var benva = this.benva;    
+      var benva = this.benva;
       var consequent = node.consequent;
       var alternate = node.alternate;
       // TODO ToBoolean
@@ -1646,7 +1646,7 @@ function es5Cesk(cc)
         return consequentState.concat(alternateState);
       }
     }
-  
+
   function doScopeLookup(name, benva, store)
   {
     var result = BOT;
@@ -1671,7 +1671,7 @@ function es5Cesk(cc)
     // create an error branch if one of the chains doesn't find the var
     if (result === BOT)
     {
-      throw new Error("ReferenceError: " + name + " is not defined"); //TODO turn this into stack trace      
+      throw new Error("ReferenceError: " + name + " is not defined"); //TODO turn this into stack trace
     }
     return result;
   }
@@ -1706,7 +1706,7 @@ function es5Cesk(cc)
     }
     if (setTopLevel)
     {
-      var benv = store.lookupAval(globala);      
+      var benv = store.lookupAval(globala);
       benv = benv.add(name, value);
       store = store.updateAval(globala, benv); // side-effect
     }
@@ -1724,7 +1724,7 @@ function es5Cesk(cc)
     }
     if (hoisted.funs.length > 0 || hoisted.vars.length > 0)
     {
-      var benv = store.lookupAval(benva);      
+      var benv = store.lookupAval(benva);
       hoisted.funs.forEach(
         function (funDecl)
         {
@@ -1738,7 +1738,7 @@ function es5Cesk(cc)
       hoisted.vars.forEach(
         function (varDecl)
         {
-          var vr = varDecl.node.id;    
+          var vr = varDecl.node.id;
           benv = benv.add(p.abst1(vr.name), L_UNDEFINED);
         });
       store = store.updateAval(benva, benv); // side-effect
@@ -1765,7 +1765,7 @@ function es5Cesk(cc)
 
   function evalProgram(node, benva, store, kont)
   {
-    store = doHoisting(node, benva, store, kont);    
+    store = doHoisting(node, benva, store, kont);
     return evalStatementList(node, benva, store, kont);
   }
 
@@ -1801,12 +1801,12 @@ function es5Cesk(cc)
   }
 
   function evalVariableDeclarator(node, benva, store, kont)
-  { 
+  {
     var init = node.init;
-      
+
     if (init === null)
     {
-      return kont.pop(function (frame) {return new KontState(frame, L_UNDEFINED, store)});      
+      return kont.pop(function (frame) {return new KontState(frame, L_UNDEFINED, store)});
     }
     var frame = new VariableDeclaratorKont(node, benva);
     return kont.push(frame, new EvalState(init, benva, store));
@@ -1910,9 +1910,9 @@ function es5Cesk(cc)
   }
 
   function evalAssignmentExpression(node, benva, store, kont)
-  { 
+  {
     var left = node.left;
-    
+
     switch (left.type)
     {
       case "Identifier":
@@ -1921,16 +1921,16 @@ function es5Cesk(cc)
       }
       case "MemberExpression":
       {
-        return evalAssignmentExpressionMember(node, benva, store, kont);        
+        return evalAssignmentExpressionMember(node, benva, store, kont);
 //        return evalBaseExpression(left, stack.addFirst(rightCont()), benva, store, time);
       }
       default:
-        throw new Error("evalAssignment: cannot handle left hand side " + left); 
+        throw new Error("evalAssignment: cannot handle left hand side " + left);
     }
   }
 
   function evalAssignmentExpressionIdentifier(node, benva, store, kont)
-  { 
+  {
     var right = node.right;
     var frame = new AssignIdentifierKont(node, benva);
     return kont.push(frame, new EvalState(right, benva, store));
@@ -1982,13 +1982,13 @@ function es5Cesk(cc)
   {
     var closure = createClosure(node, benva);
     var closurea = a.closure(node, benva, store, kont);
-  
+
     var prototype = createObject(objectProtoRef);
     var prototypea = a.closureProtoObject(node, benva, store, kont);
     var closureRef = l.abst1(closurea);
     prototype = prototype.add(P_CONSTRUCTOR, closureRef);
     store = store.allocAval(prototypea, prototype);
-  
+
     closure = closure.add(P_PROTOTYPE, l.abst1(prototypea));
     store = store.allocAval(closurea, closure);
     return {store: store, ref: closureRef}
@@ -2011,21 +2011,21 @@ function es5Cesk(cc)
   function evalCallExpression(node, benva, store, kont)
   {
     var calleeNode = node.callee;
-      
+
     if (Ast.isMemberExpression(calleeNode))
     { // TODO
       var cont = new Cont("meth", node, null, benva, methodOperatorCont);
       return evalNode(calleeNode.object, stack.addFirst(cont), benva, store, time);
     }
-    
+
     var frame = new OperatorKont(node, benva);
-    return kont.push(frame, new EvalState(calleeNode, benva, store));      
+    return kont.push(frame, new EvalState(calleeNode, benva, store));
   }
 
   function applyProc(node, operatorValue, operandValues, thisValue, benva, store, kont)
   {
     // TODO 'thisValue' handling/type coercions?
-    
+
     var operatorPrim = operatorValue.prim;
     if (operatorPrim === BOT)
     {
@@ -2059,21 +2059,21 @@ function es5Cesk(cc)
     {
       return kont.pop(function (frame) {return new KontState(frame, L_UNDEFINED, store)});
     }
-    
+
     var formalParameters = funNode.params;
-  
-    var extendedBenv = createEnvironment(statica);    
+
+    var extendedBenv = createEnvironment(statica);
     extendedBenv = extendedBenv.add(P_THIS, l.abst1(thisa));
     for (var i = 0; i < formalParameters.length; i++)
     {
       var param = formalParameters[i];
       extendedBenv = extendedBenv.add(p.abst1(param.name), operandValues[i]);
-    }    
+    }
     var extendedBenva = a.benv(applicationNode, benva, store, kont);
-    
+
     store = doHoisting(funNode, benva, store, kont);
     store = store.allocAval(extendedBenva, extendedBenv);
-    
+
     // ECMA 13.2.1(6): [[Code]] cannot be evaluated as StatementList
     var frame = new BodyKont(bodyNode, 1, extendedBenva);
     return kont.push(frame, new EvalState(nodes[0], extendedBenva, store));
@@ -2089,7 +2089,7 @@ function es5Cesk(cc)
       store = store.updateAval(benva, benv);
       return kont.pop(function (frame) {return new ReturnState(node, benva, store, frame)});
     }
-    
+
     var frame = new ReturnKont(node, benva);
     return kont.push(frame, new EvalState(argumentNode, benva, store));
   }
@@ -2104,7 +2104,7 @@ function es5Cesk(cc)
     }
     return kont.pop(function (frame) {return new ReturnState(node, returna, store, frame)});
   }
-  
+
   function applyKont(frame, value, store, kont)
   {
     if (frame.isMarker)
@@ -2132,7 +2132,7 @@ function es5Cesk(cc)
   {
     switch (node.type)
     {
-      case "Literal": 
+      case "Literal":
         return evalLiteral(node, benva, store, kont);
       case "Identifier":
         return evalIdentifier(node, benva, store, kont);
@@ -2162,43 +2162,43 @@ function es5Cesk(cc)
         return evalUnaryExpression(node, benva, store, kont);
       case "ExpressionStatement":
         return evalNode(node.expression, benva, store, kont);
-      case "ReturnStatement": 
+      case "ReturnStatement":
         return evalReturnStatement(node, benva, store, kont);
-      case "BreakStatement": 
+      case "BreakStatement":
         return evalBreakStatement(node, benva, store, kont);
-      case "LabeledStatement": 
+      case "LabeledStatement":
         return evalLabeledStatement(node, benva, store, kont);
-      case "IfStatement": 
+      case "IfStatement":
         return evalIfStatement(node, benva, store, kont);
-      case "ConditionalExpression": 
+      case "ConditionalExpression":
         return evalConditionalExpression(node, benva, store, kont);
-      case "SwitchStatement": 
+      case "SwitchStatement":
         return evalSwitchStatement(node, benva, store, kont);
-      case "ForStatement": 
+      case "ForStatement":
         return evalForStatement(node, benva, store, kont);
-      case "WhileStatement": 
+      case "WhileStatement":
         return evalWhileStatement(node, benva, store, kont);
-      case "FunctionDeclaration": 
+      case "FunctionDeclaration":
         return evalFunctionDeclaration(node, benva, store, kont);
-      case "VariableDeclaration": 
+      case "VariableDeclaration":
         return evalVariableDeclaration(node, benva, store, kont);
-      case "VariableDeclarator": 
+      case "VariableDeclarator":
         return evalVariableDeclarator(node, benva, store, kont);
       case "BlockStatement":
         return evalStatementList(node, benva, store, kont);
       case "EmptyStatement":
         return evalEmptyStatement(node, benva, store, kont);
-      case "TryStatement": 
+      case "TryStatement":
         return evalTryStatement(node, benva, store, kont);
-      case "ThrowStatement": 
+      case "ThrowStatement":
         return evalThrowStatement(node, benva, store, kont);
       case "Program":
         return evalProgram(node, benva, store, kont);
       default:
-        throw new "cannot handle node " + node.type; 
+        throw new "cannot handle node " + node.type;
     }
   }
-    
+
   var module = {};
   module.evalState =
     function (node, benva, store)
@@ -2209,6 +2209,6 @@ function es5Cesk(cc)
   module.l = l;
   module.store = store;
   module.globala = globala;
-  return module; 
+  return module;
 }
 

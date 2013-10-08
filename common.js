@@ -22,9 +22,9 @@ var Eq =
 Eq.checker =
   function (x)
   {
-    return function (y) { return Eq.equals(x,y); }; 
-  };  
-  
+    return function (y) { return Eq.equals(x,y); };
+  };
+
 var HashCode = {};
 HashCode.hashCode =
   function (x)
@@ -35,26 +35,26 @@ HashCode.hashCode =
     }
     if (x === true || typeof x === "number")
     {
-      return x >>> 0; 
+      return x >>> 0;
     }
     return x.hashCode();
   }
-  
+
 var Visitor = {};
 Visitor.accept = function (visitor) {return function (x) {return x.accept ? x.accept(visitor) : String(x)}};
-  
+
 Boolean.prototype.equals =
 	function (x)
 	{
 		return this.valueOf() === x.valueOf();
 	};
-	
+
 Boolean.prototype.hashCode =
   function ()
   {
     return this.valueOf() ? 1 : 0;
   }
-	
+
 Array.prototype.toString =
 	function ()
 	{
@@ -66,10 +66,10 @@ Array.prototype.toString =
 		var s = "[";
 		for (var i = 0; i < this.length - 1; i++)
 		{
-			s += this[i] + ","; 
+			s += this[i] + ",";
 		}
 		s += this[i] + "]";
-		return s;		
+		return s;
 	};
 
 Array.prototype.memberAt =
@@ -97,12 +97,12 @@ Array.prototype.flatMap =
 	{
 		return this.map(f, th).flatten();
 	};
-	
+
 Array.prototype.addFirst =
 	function (x)
 	{
 		return [x].concat(this);
-	};		
+	};
 
 Array.prototype.addLast =
 	function (x)
@@ -112,8 +112,8 @@ Array.prototype.addLast =
 			return this.concat([x]);
 		}
 		return this.concat(x);
-	};		
-	
+	};
+
 Array.prototype.addUniqueLast =
 	function (x)
 	{
@@ -123,7 +123,7 @@ Array.prototype.addUniqueLast =
 		}
 		return this.addLast(x);
 	};
-	
+
 Array.prototype.remove =
   function (x)
   {
@@ -134,7 +134,7 @@ Array.prototype.remove =
     }
     return this.slice(0, i).concat(this.slice(i+1));
   }
-  
+
 Array.prototype.removeAll =
   function (xs)
   {
@@ -163,7 +163,7 @@ Array.prototype.keepAll =
       });
   }
 
-Array.prototype.toSet = 
+Array.prototype.toSet =
   function ()
   {
     var result = [];
@@ -173,7 +173,7 @@ Array.prototype.toSet =
     }
     return result;
   }
-  
+
 Array.prototype.equals =
 	function (x)
 	{
@@ -201,7 +201,7 @@ Array.prototype.equals =
 		}
 		return true;
 	};
-	
+
 Array.prototype.hashCode =
   function()
   {
@@ -215,7 +215,7 @@ Array.prototype.hashCode =
     }
     return hash;
   }
-	  
+
 Array.prototype.subsumes =
   function (xs)
   {
@@ -228,7 +228,7 @@ Array.prototype.subsumes =
     }
     return true;
   };
-	  
+
 Array.prototype.setEquals =
 	function (x)
 	{
@@ -251,9 +251,9 @@ Array.prototype.setEquals =
 Array.prototype.addEntry =
 	function (key, value)
 	{
-		return this.addFirst([key, value]);	
+		return this.addFirst([key, value]);
 	};
-	
+
 Array.prototype.getEntry =
 	function (key)
 	{
@@ -289,7 +289,7 @@ Array.prototype.updateEntry =
 		}
 		return this.concat([[key, value]]);
 	};
-	
+
 Array.prototype.entryKeys =
   function ()
   {
@@ -298,8 +298,8 @@ Array.prototype.entryKeys =
       {
         return entry[0];
       });
-  } 
-  
+  }
+
 Array.prototype.entryValues =
   function ()
   {
@@ -308,7 +308,7 @@ Array.prototype.entryValues =
       {
         return entry[1];
       });
-  } 
+  }
 
 Array.prototype.getSetEntry =
 	function (key)
@@ -319,8 +319,8 @@ Array.prototype.getSetEntry =
 			return entry[1];
 		}
 		return [];
-	}	
-	
+	}
+
 Array.prototype.updateSetEntry =
 	function (key, value)
 	{
@@ -335,9 +335,9 @@ Array.prototype.updateSetEntry =
 		}
 		return this.concat([[key, [value]]]);
 	};
-	
+
 var Arrays = {};
-	
+
 Arrays.indexOf =
   function (x, arr, eq)
   {
@@ -375,7 +375,7 @@ Arrays.deleteDuplicates =
     return arr.reduce(
       function (acc, x)
       {
-        return Arrays.indexOf(x, acc, eq) === -1 ? acc.concat([x]) : acc; 
+        return Arrays.indexOf(x, acc, eq) === -1 ? acc.concat([x]) : acc;
       }, []);
   }
 
@@ -420,8 +420,8 @@ Arrays.cartesianProduct =
       function (x)
       {
         return rest.map(
-          function (y) 
-          { 
+          function (y)
+          {
             return y.addFirst(x);
           });
       });
@@ -445,19 +445,19 @@ String.prototype.startsWith =
 	{
 		return this.lastIndexOf(s, 0) === 0;
 	};
-	
-String.prototype.endsWith = 
+
+String.prototype.endsWith =
 	function (s)
 	{
 		return this.indexOf(s, this.length - s.length) !== -1;
 	};
-	
+
 String.prototype.equals =
 	function (x)
 	{
-		return this.localeCompare(x) === 0;	
+		return this.localeCompare(x) === 0;
 	};
-	
+
 String.prototype.hashCode =
   function()
   {
@@ -479,13 +479,13 @@ Character.isWhitespace =
   {
     return x === " " || x === "\n" || x === "\t" || x === "\r";
   }
-  
+
 Character.isDigit =
   function (x)
   {
     return x === "0" || x === "1" || x === "2" || x === "3" || x === "4" || x === "5" || x === "6" || x === "7" || x === "8" || x === "9";
   }
-  
+
 Function.prototype.toString =
 	function ()
 	{
@@ -495,16 +495,16 @@ Function.prototype.toString =
 Number.prototype.equals =
   function (x)
   {
-    return this.valueOf() === x; 
+    return this.valueOf() === x;
   };
-  
+
 Number.prototype.hashCode =
   function ()
   {
     return this.valueOf();
   }
-	  
-	
+
+
 // debug
 function d(value) { print(Array.prototype.slice.call(arguments)); return value; }
 function dreadline() { var str = readline(); if (str === ":b") { throw new Error(":b"); }}
@@ -529,7 +529,7 @@ function assertSetEquals(expected, actual)
   {
     return;
   }
-  throw new Error("assertSetEquals: expected " + expected + ", got " + actual + "\ndiff " + expected.removeAll(actual) + "\n     " + actual.removeAll(expected)); 
+  throw new Error("assertSetEquals: expected " + expected + ", got " + actual + "\ndiff " + expected.removeAll(actual) + "\n     " + actual.removeAll(expected));
 }
 
 function assertNotEquals(expected, actual)
@@ -591,12 +591,12 @@ Ecma.sign =
 // 8.6.2
 Ecma.Class =
   {
-    OBJECT: "Object", 
-    FUNCTION: "Function", 
-    ARRAY: "Array", 
-    ARGUMENTS: "Arguments", 
-    STRING: "String", 
-    BOOLEAN: "Boolean", 
+    OBJECT: "Object",
+    FUNCTION: "Function",
+    ARRAY: "Array",
+    ARGUMENTS: "Arguments",
+    STRING: "String",
+    BOOLEAN: "Boolean",
     NUMBER: "Number",
     MATH: "Math",
     DATE: "Date",
@@ -633,7 +633,7 @@ Collections.values =
 
 /*
  * Map interface
- * 
+ *
  * equals/hashCode TODO
  * put
  * get
@@ -642,7 +642,7 @@ Collections.values =
  * values
  * size
  * clear
- *  
+ *
  */
 
 function Map()
@@ -769,24 +769,24 @@ HashMap.prototype.put =
           newBuckets[i] = {key:key, value:value};
           var newEntries = this._entries.slice(0);
           newEntries[hash] = newBuckets;
-          newEntries.size = this.size(); 
-          return new HashMap(newEntries);      
+          newEntries.size = this.size();
+          return new HashMap(newEntries);
         }
       }
       var newBuckets = buckets.slice(0);
-      newBuckets[i] = {key:key, value:value};      
+      newBuckets[i] = {key:key, value:value};
     }
     var newEntries = this._entries.slice(0);
     newEntries[hash] = newBuckets;
     newEntries.size = this.size() + 1;
-    return new HashMap(newEntries);      
+    return new HashMap(newEntries);
   }
 
 HashMap.prototype.get =
   function (key, bot)
   {
     var hash = Math.abs(key.hashCode()) % this._entries.length;
-    var buckets = this._entries[hash];    
+    var buckets = this._entries[hash];
     if (!buckets)
     {
       return bot;
@@ -819,11 +819,11 @@ HashMap.prototype.remove =
         var newBuckets = buckets.slice(0, i).concat(buckets.slice(i + 1));
         var newEntries = this._entries.slice(0);
         newEntries[hash] = newBuckets;
-        newEntries.size = this.size() - 1; 
+        newEntries.size = this.size() - 1;
         return new HashMap(newEntries);
       }
     }
-    return this;        
+    return this;
   }
 
 HashMap.prototype.entries =
@@ -847,7 +847,7 @@ HashMap.prototype.iterateEntries =
           {
             return false;
           }
-        }        
+        }
       }
     }
     return true;
@@ -938,14 +938,14 @@ LatticeMap.prototype.map =
 
 /*
  * Set interface
- * 
+ *
  * equals, hashCode (based on values)
  * add
  * addAll
  * contains
  * values
  * size
- *  
+ *
  */
 function Set()
 {
@@ -1007,19 +1007,19 @@ Set.prototype.join =
   function (x)
   {
     return x.values().reduce(function (result, value) {return result.add(value)}, this);
-  } 
+  }
 
 Set.prototype.meet =
   function (x)
   {
     return this.values().reduce(function (result, value) {return x.contains(value) ? result.add(value) : result}, this.clear());
-  } 
+  }
 
 Set.prototype.subtract =
   function (x)
   {
     return this.values().reduce(function (result, value) {return x.contains(value) ? result : result.add(value)}, this.clear());
-  } 
+  }
 
 function HashSet(map)
 {
@@ -1253,12 +1253,12 @@ ArraySet.prototype.nice =
 
 /*
  * Deque interface
- * 
+ *
  * equals, hashCode (based on values)
  * addFirst, addLast
  * removeFirst, removeLast
  * size
- *  
+ *
  */
 function ArrayDeque(arr)
 {
@@ -1320,11 +1320,11 @@ ArrayDeque.prototype.toString =
 
 /*
  * Queue interface
- * 
+ *
  * equals, hashCode (based on values)
  * add, remove
  * size
- *  
+ *
  */
 function ArrayQueue(arr)
 {

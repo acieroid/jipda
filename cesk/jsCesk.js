@@ -6,14 +6,14 @@ function jsCesk(cc)
   var b = cc.b || new DefaultBenv();
   // primitive lattice
   var p = cc.p;
-  
+
   assertDefinedNotNull(a);
 //  assertDefinedNotNull(b);
   assertDefinedNotNull(p);
 
   // lattice (primitives + addresses)
   var l = new JipdaLattice(p); // TODO this will become param
-  
+
   // install constants
   var L_UNDEFINED = l.abst1(undefined);
   var L_NULL = l.abst1(null);
@@ -33,7 +33,7 @@ function jsCesk(cc)
   var P_NUMBER = p.NUMBER;
   var P_STRING = p.STRING;
   var P_DEFINED = P_NULL.join(P_TRUE).join(P_FALSE).join(P_NUMBER).join(P_STRING);
-  
+
   var P_RETVAL = p.abst1("!retVal!");
 
   // install global pointers and refs
@@ -47,7 +47,7 @@ function jsCesk(cc)
   var stringProtoRef = l.abst1(stringPa);
   var arrayPa = new ContextAddr("Array.prototype", 0);
   var arrayProtoRef = l.abst1(arrayPa);
-  
+
   function createEnvironment(parenta)
   {
     var benv = b.createEnvironment(parenta);
@@ -85,13 +85,13 @@ function jsCesk(cc)
     var benv = b.createFunction(new BenvPrimitiveCall(applyFunction), functionProtoRef);
     return benv;
   }
-  
+
   function registerProperty(object, propertyName, value)
   {
     object = object.add(p.abst1(propertyName), value);
-    return object;      
+    return object;
   }
-  
+
   // create global object and initial store
   var global = createObject(objectProtoRef);
   var store = new Store();
@@ -99,21 +99,21 @@ function jsCesk(cc)
   function registerPrimitiveFunction(object, objectAddress, propertyName, fun)
   {
     var primFunObject = createPrimitive(fun);
-    var primFunObjectAddress = new ContextAddr(objectAddress, "<" + propertyName + ">"); 
-    store = store.allocAval(primFunObjectAddress, primFunObject);    
+    var primFunObjectAddress = new ContextAddr(objectAddress, "<" + propertyName + ">");
+    store = store.allocAval(primFunObjectAddress, primFunObject);
     return registerProperty(object, propertyName, l.abst1(primFunObjectAddress));
   }
-  
+
   // BEGIN OBJECT
   var objectP = createObject(L_NULL);
   objectP.toString = function () { return "<Object.prototype>"; }; // debug
   var objecta = new ContextAddr("<Object>", 0);
   objectP = registerProperty(objectP, "constructor", l.abst1(objecta));
-  
+
   var object = createPrimitive(objectConstructor);
   object = object.add(P_PROTOTYPE, objectProtoRef);//was objectProtoRef
   global = global.add(p.abst1("Object"), l.abst1(objecta));
-  
+
 //  object = registerPrimitiveFunction(object, objecta, "getPrototypeOf", objectGetPrototypeOf);
 //  object = registerPrimitiveFunction(object, objecta, "create", objectCreate);
 
@@ -121,7 +121,7 @@ function jsCesk(cc)
   store = store.allocAval(objectPa, objectP);
   // END OBJECT
 
-      
+
   // BEGIN FUNCTION
   var functionP = createObject(objectProtoRef);
   functionP.toString = function () { return "<Function.prototype>"; }; // debug
@@ -133,8 +133,8 @@ function jsCesk(cc)
   store = store.allocAval(functiona, fun);
 
   store = store.allocAval(functionPa, functionP);
-  // END FUNCTION 
-          
+  // END FUNCTION
+
   // BEGIN STRING
   var stringP = createObject(objectProtoRef);
   stringP.toString = function () { return "<String.prototype>"; }; // debug
@@ -147,8 +147,8 @@ function jsCesk(cc)
   store = store.allocAval(stringa, string);
 
   store = store.allocAval(stringPa, stringP);
-  // END STRING 
-          
+  // END STRING
+
   // BEGIN ARRAY
 //  var arrayP = createObject(objectProtoRef);
 //  arrayP.toString = function () { return "<Array.prototype>"; }; // debug
@@ -159,7 +159,7 @@ function jsCesk(cc)
 //  var arrayNa = new ContextAddr("Array", 0);
 //  store = store.allocAval(arraya, array);
 //  global = global.add(p.abst1("Array"), l.abst1(arraya));
-//  
+//
 //  arrayP = registerPrimitiveFunction(arrayP, arrayPa, "concat", arrayConcat);
 //  arrayP = registerPrimitiveFunction(arrayP, arrayPa, "push", arrayPush);
 //  arrayP = registerPrimitiveFunction(arrayP, arrayPa, "map", arrayMap);
@@ -167,7 +167,7 @@ function jsCesk(cc)
 //  arrayP = registerPrimitiveFunction(arrayP, arrayPa, "filter", arrayFilter);
 //  store = store.allocAval(arrayPa, arrayP);
   // END ARRAY
-  
+
   // BEGIN MATH
 //  var math = createObject(objectProtoRef);
 //  math = registerPrimitiveFunction(math, globala, "abs", mathAbs);
@@ -182,7 +182,7 @@ function jsCesk(cc)
 //  store = store.allocAval(matha, math);
 //  global = global.add(p.abst1("Math"), l.abst1(matha));
   // END MATH
-  
+
   // BEGIN GLOBAL
   global = global.add(P_THIS, globalRef); // global "this" address
   // ECMA 15.1.1 value properties of the global object (no "null", ...)
@@ -195,10 +195,10 @@ function jsCesk(cc)
 //  global = registerPrimitiveFunction(global, globala, "$join", $join);
 //  global = registerPrimitiveFunction(global, globala, "print", _print);
   // end specific interpreter functions
-  
+
   store = store.allocAval(globala, global);
   // END GLOBAL
-  
+
   // BEGIN PRIMITIVES
   function objectConstructor(application, operands, objectAddress, stack, benva, store, time)
   {
@@ -207,8 +207,8 @@ function jsCesk(cc)
     var obj = createObject(objectProtoRef);
     store = allocAval(objectAddress, obj, stack, store);
     return kont[0].apply(stack2.addFirst(l.abst1(objectAddress)), store, time);
-  }    
-  
+  }
+
   function stringConstructor(application, operands, ths, stack, benva, store, time)
   {
     // TODO (also for other built-in constructors): throwing away freshly created object (that has different addr, so not that bad)!
@@ -220,32 +220,32 @@ function jsCesk(cc)
 
       if (operands.length === 0)
       {
-        var stringBenv = createString(p.abst1("")); // TODO constant 
+        var stringBenv = createString(p.abst1("")); // TODO constant
         var stringAddress = a.string(application, time);
         stringBenv = stringBenv.add(P_LENGTH, L_0);
         store = allocAval(stringAddress, stringBenv, stack, store);
         return kont[0].apply(stack2.addFirst(l.abst1(stringAddress)), store, time);
       }
-      
+
       var prim = operands[0].user.ToString(); // TODO ToString iso. project
-      var stringBenv = createString(prim); 
+      var stringBenv = createString(prim);
       var stringAddress = a.array(application, time); // TODO this is not an array(!)
       stringBenv = stringBenv.add(P_LENGTH, new JipdaValue(prim.length(), []));
       store = allocAval(stringAddress, stringBenv, stack, store);
-      return kont[0].apply(stack2.addFirst(l.abst1(stringAddress)), store, time);        
+      return kont[0].apply(stack2.addFirst(l.abst1(stringAddress)), store, time);
     }
     if (operands.length === 0)
     {
       var cont = stack[0];
       var stack2 = stack.slice(1);
-      return kont[0].apply(stack2.addFirst(l.abst1("")), store, time); // TODO constant  
+      return kont[0].apply(stack2.addFirst(l.abst1("")), store, time); // TODO constant
     }
     return ToString(application, stack.addFirst(operands[0]), benva, store, time);
-  }    
-      
+  }
+
   // END PRIMITIVES
-  
-  
+
+
   function BenvPrimitiveCall(applyFunction)
   {
     this.applyFunction = applyFunction;
@@ -256,7 +256,7 @@ function jsCesk(cc)
     {
       return "<BenvPrimitiveCall>";
     }
-  
+
   BenvPrimitiveCall.prototype.equals =
     function (other)
     {
@@ -270,13 +270,13 @@ function jsCesk(cc)
       }
       return this.applyFunction === other.applyFunction; // this case needed? (finite number of fixed prims)
     }
-  
+
   BenvPrimitiveCall.prototype.addresses =
     function ()
     {
       return [];
-    } 
-  
+    }
+
   function BenvClosureCall(node, scope)
   {
     this.node = node;
@@ -315,7 +315,7 @@ function jsCesk(cc)
       var result = 1;
       result = prime * result + this.node.hashCode();
       result = prime * result + this.scope.hashCode();
-      return result;      
+      return result;
     }
 
 
@@ -334,7 +334,7 @@ function jsCesk(cc)
     {
       return [this.scope];
     }
-  
+
   function InitState(node, benva, store, haltFrame)
   {
     this.type = "init";
@@ -357,7 +357,7 @@ function jsCesk(cc)
     function (x)
     {
       return this.type === x.type
-        && this.node === x.node 
+        && this.node === x.node
         && Eq.equals(this.benva, x.benva)
         && Eq.equals(this.store, x.store)
         && Eq.equals(this.haltFrame, x.haltFrame);
@@ -409,7 +409,7 @@ function jsCesk(cc)
     function (x)
     {
       return (x instanceof EvalState)
-        && this.node === x.node 
+        && this.node === x.node
         && Eq.equals(this.benva, x.benva)
         && Eq.equals(this.store, x.store);
     }
@@ -437,10 +437,10 @@ function jsCesk(cc)
     {
       return new EvalState(this.node, this.benva, store);
     }
-  
+
   function KontState(frame, value, store)
   {
-    this.type = "kont";  
+    this.type = "kont";
     this.frame = frame;
     this.value = value;
     this.store = store;
@@ -449,8 +449,8 @@ function jsCesk(cc)
     function (x)
     {
       return (x instanceof KontState)
-        && Eq.equals(this.frame, x.frame) 
-        && Eq.equals(this.value, x.value) 
+        && Eq.equals(this.frame, x.frame)
+        && Eq.equals(this.value, x.value)
         && Eq.equals(this.store, x.store)
     }
   KontState.prototype.hashCode =
@@ -487,7 +487,7 @@ function jsCesk(cc)
     {
       return new KontState(this.frame, this.value, store);
     }
-  
+
   function ApplyState(node, fun, statica, operandValues, thisa, extendedBenva, store)
   {
     this.type = "apply";
@@ -554,7 +554,7 @@ function jsCesk(cc)
     {
       return new ApplyState(this.node, this.fun, this.statica, this.operandValues, this.thisa, this.extendedBenva, store);
     }
-  
+
   function ReturnState(node, returna, store, frame)
   {
     this.type = "return";
@@ -563,15 +563,15 @@ function jsCesk(cc)
     this.store = store;
     this.frame = frame;
   }
-  
+
   ReturnState.prototype.equals =
     function (x)
     {
       return (x instanceof ReturnState)
-        && this.node === x.node 
-        && Eq.equals(this.returna, x.returna) 
-        && Eq.equals(this.store, x.store) 
-        && Eq.equals(this.frame, x.frame); 
+        && this.node === x.node
+        && Eq.equals(this.returna, x.returna)
+        && Eq.equals(this.store, x.store)
+        && Eq.equals(this.frame, x.frame);
     }
   ReturnState.prototype.hashCode =
     function ()
@@ -609,7 +609,7 @@ function jsCesk(cc)
     {
       return new ReturnState(this.node, this.returna, store, this.frame);
     }
-  
+
   function ReturnMarker(node, benva, callable, extendedBenva)
   {
     this.node = node;
@@ -658,7 +658,7 @@ function jsCesk(cc)
     {
       throw new Error("cannot apply marker");
     }
-  
+
   function VariableDeclarationKont(node, i, benva)
   {
     this.node = node;
@@ -704,7 +704,7 @@ function jsCesk(cc)
       var node = this.node;
       var benva = this.benva;
       var i = this.i;
-      
+
       var nodes = node.declarations;
       if (i === nodes.length)
       {
@@ -713,7 +713,7 @@ function jsCesk(cc)
       var frame = new VariableDeclarationKont(node, i + 1, benva);
       return kont.push(frame, new EvalState(nodes[i], benva, store));
     }
-  
+
   function VariableDeclaratorKont(node, benva)
   {
     this.node = node;
@@ -760,7 +760,7 @@ function jsCesk(cc)
       store = store.updateAval(benva, benv); // side-effect
       return kont.pop(function (frame) {return new KontState(frame, L_UNDEFINED, store)});
     }
-  
+
   function LeftKont(node, benva)
   {
     this.node = node;
@@ -805,7 +805,7 @@ function jsCesk(cc)
       var frame = new RightKont(node, benva, leftValue);
       return kont.push(frame, new EvalState(node.right, benva, store));
     }
-  
+
   function RightKont(node, benva, leftValue)
   {
     this.node = node;
@@ -862,7 +862,7 @@ function jsCesk(cc)
       }
       throw new Error("TODO");
     }
-  
+
   function AssignIdentifierKont(node, benva)
   {
     this.node = node;
@@ -872,7 +872,7 @@ function jsCesk(cc)
     function (x)
     {
       return x instanceof AssignIdentifierKont
-        && this.node === x.node 
+        && this.node === x.node
         && Eq.equals(this.benva, x.benva);
     }
   AssignIdentifierKont.prototype.hashCode =
@@ -909,7 +909,7 @@ function jsCesk(cc)
       store = doScopeSet(p.abst1(id.name), value, benva, store, marks);
       return kont.pop(function (frame) {return new KontState(frame, value, store)}, marks);
     }
-  
+
   function OperatorKont(node, benva)
   {
     this.node = node;
@@ -952,7 +952,7 @@ function jsCesk(cc)
       var node = this.node;
       var benva = this.benva;
       var operands = node.arguments;
-  
+
       if (operands.length === 0)
       {
         return applyProc(node, operatorValue, [], globalRef, benva, store, kont);
@@ -960,25 +960,25 @@ function jsCesk(cc)
       var frame = new OperandsKont(node, 1, benva, operatorValue, [], globalRef);
       return kont.push(frame, new EvalState(operands[0], benva, store));
     }
-  
+
   function OperandsKont(node, i, benva, operatorValue, operandValues, thisValue)
   {
     this.node = node;
     this.i = i;
     this.benva = benva;
-    this.operatorValue = operatorValue; 
-    this.operandValues = operandValues; 
+    this.operatorValue = operatorValue;
+    this.operandValues = operandValues;
     this.thisValue = thisValue;
   }
   OperandsKont.prototype.equals =
     function (x)
     {
       return x instanceof OperandsKont
-        && this.node === x.node 
-        && this.i === x.i 
-        && Eq.equals(this.benva, x.benva) 
-        && Eq.equals(this.operatorValue, x.operatorValue) 
-        && Eq.equals(this.operandValues, x.operandValues) 
+        && this.node === x.node
+        && this.i === x.i
+        && Eq.equals(this.benva, x.benva)
+        && Eq.equals(this.operatorValue, x.operatorValue)
+        && Eq.equals(this.operandValues, x.operandValues)
         && Eq.equals(this.thisValue, x.thisValue);
     }
   OperandsKont.prototype.hashCode =
@@ -1022,7 +1022,7 @@ function jsCesk(cc)
       var operandValues = this.operandValues;
       var thisValue = this.thisValue;
       var operands = node.arguments;
-  
+
       if (i === operands.length)
       {
         return applyProc(node, operatorValue, operandValues.addLast(operandValue), thisValue, benva, store, kont);
@@ -1030,7 +1030,7 @@ function jsCesk(cc)
       var frame = new OperandsKont(node, i + 1, benva, operatorValue, operandValues.addLast(operandValue), thisValue);
       return kont.push(frame, new EvalState(operands[i], benva, store));
     }
-  
+
   function BodyKont(node, i, benva)
   {
     this.node = node;
@@ -1076,7 +1076,7 @@ function jsCesk(cc)
       var node = this.node;
       var benva = this.benva;
       var i = this.i;
-      
+
       var nodes = node.body;
       if (i === nodes.length - 1)
       {
@@ -1085,7 +1085,7 @@ function jsCesk(cc)
       var frame = new BodyKont(node, i + 1, benva);
       return kont.push(frame, new EvalState(nodes[i], benva, store));
     }
-  
+
   function ReturnKont(node, benva)
   {
     this.node = node;
@@ -1095,7 +1095,7 @@ function jsCesk(cc)
     function (x)
     {
       return x instanceof ReturnKont
-        && this.node === x.node 
+        && this.node === x.node
         && Eq.equals(this.benva, x.benva);
     }
   ReturnKont.prototype.hashCode =
@@ -1132,7 +1132,7 @@ function jsCesk(cc)
       store = store.updateAval(benva, benv);
       return kont.pop(function (frame) {return new ReturnState(node, benva, store, frame)});
     }
-  
+
   function IfKont(node, benva)
   {
     this.node = node;
@@ -1142,7 +1142,7 @@ function jsCesk(cc)
     function (x)
     {
       return x instanceof IfKont
-        && this.node === x.node 
+        && this.node === x.node
         && Eq.equals(this.benva, x.benva);
     }
   IfKont.prototype.hashCode =
@@ -1173,7 +1173,7 @@ function jsCesk(cc)
     function (conditionValue, store, kont)
     {
       var node = this.node;
-      var benva = this.benva;    
+      var benva = this.benva;
       var consequent = node.consequent;
       var alternate = node.alternate;
       // TODO ToBoolean
@@ -1207,7 +1207,7 @@ function jsCesk(cc)
         return consequentState.concat(alternateState);
       }
     }
-  
+
   function ObjectKont(node, i, benva, initValues)
   {
     this.node = node;
@@ -1215,7 +1215,7 @@ function jsCesk(cc)
     this.benva = benva;
     this.initValues = initValues;
   }
-  
+
   ObjectKont.prototype.equals =
     function (x)
     {
@@ -1271,18 +1271,18 @@ function jsCesk(cc)
           obj = obj.add(propertyName, initValues[j]);
         }
         store = store.allocAval(objectAddress, obj);
-        return kont.pop(function (frame) {return new KontState(frame, l.abst1(objectAddress), store)});        
+        return kont.pop(function (frame) {return new KontState(frame, l.abst1(objectAddress), store)});
       }
       var frame = new ObjectKont(node, i + 1, benva, initValues);
       return kont.push(frame, new EvalState(properties[i].value, benva, store));
     }
-  
+
   function MemberKont(node, benva)
   {
     this.node = node;
     this.benva = benva;
   }
-  
+
   MemberKont.prototype.equals =
     function (x)
     {
@@ -1327,13 +1327,13 @@ function jsCesk(cc)
       var value = doProtoLookup(p.abst1(property.name), objectRef, store, marks);
       return kont.pop(function (frame) {return new KontState(frame, value, store)}, marks);
     }
-  
+
   function MemberAssignmentKont(node, benva)
   {
     this.node = node;
     this.benva = benva;
   }
-  
+
   MemberAssignmentKont.prototype.equals =
     function (x)
     {
@@ -1374,14 +1374,14 @@ function jsCesk(cc)
       var frame = new MemberAssignmentValueKont(node, benva, objectRef);
       return kont.push(frame, new EvalState(right, benva, store));
     }
-  
+
   function MemberAssignmentValueKont(node, benva, objectRef)
   {
     this.node = node;
     this.benva = benva;
     this.objectRef = objectRef;
   }
-  
+
   MemberAssignmentValueKont.prototype.equals =
     function (x)
     {
@@ -1429,7 +1429,7 @@ function jsCesk(cc)
       store = doProtoSet(p.abst1(property.name), value, this.objectRef, store, marks);
       return kont.pop(function (frame) {return new KontState(frame, value, store)}, marks);
     }
-  
+
   function Read(address)
   {
     this.address = address;
@@ -1447,14 +1447,14 @@ function jsCesk(cc)
       var prime = 3;
       var result = 1;
       result = prime * result + this.address.hashCode();
-      return result;      
+      return result;
     }
   Read.prototype.toString =
     function ()
     {
       return "{R " + this.address + "}";
     }
-  
+
   function Write(address)
   {
     this.address = address;
@@ -1472,14 +1472,14 @@ function jsCesk(cc)
       var prime = 5;
       var result = 1;
       result = prime * result + this.address.hashCode();
-      return result;      
+      return result;
     }
   Write.prototype.toString =
     function ()
     {
       return "{W " + this.address + "}";
     }
-  
+
   function doScopeLookup(name, benva, store, marks)
   {
     var result = BOT;
@@ -1506,7 +1506,7 @@ function jsCesk(cc)
     // create an error branch if one of the chains doesn't find the var
     if (result === BOT)
     {
-      throw new Error("ReferenceError: " + name + " is not defined"); //TODO turn this into stack trace      
+      throw new Error("ReferenceError: " + name + " is not defined"); //TODO turn this into stack trace
     }
     return result;
   }
@@ -1544,7 +1544,7 @@ function jsCesk(cc)
     }
     if (result === BOT)
     {
-      throw new Error("lookup of " + name + " returns BOT");      
+      throw new Error("lookup of " + name + " returns BOT");
     }
     return result;
   }
@@ -1589,7 +1589,7 @@ function jsCesk(cc)
     }
     return store;
   }
-  
+
   function doProtoSet(name, value, objectRef, store, marks)
   {
     var benvas = objectRef.addresses();
@@ -1605,7 +1605,7 @@ function jsCesk(cc)
     }
     return store;
   }
-  
+
   function evalEmptyStatement(node, benva, store, kont)
   {
     return kont.pop(function (frame) {return new KontState(frame, L_UNDEFINED, store)});
@@ -1665,11 +1665,11 @@ function jsCesk(cc)
     var init = node.init;
     if (init === null)
     {
-      var vr = node.id;    
-      var benv = store.lookupAval(benva);      
+      var vr = node.id;
+      var benv = store.lookupAval(benva);
       benv = benv.add(p.abst1(vr.name), L_UNDEFINED);
       store = store.updateAval(benva, benv); // side-effect
-      return kont.pop(function (frame) {return new KontState(frame, L_UNDEFINED, store)});      
+      return kont.pop(function (frame) {return new KontState(frame, L_UNDEFINED, store)});
     }
     var frame = new VariableDeclaratorKont(node, benva);
     return kont.push(frame, new EvalState(init, benva, store));
@@ -1773,7 +1773,7 @@ function jsCesk(cc)
   }
 
   function evalAssignmentExpression(node, benva, store, kont)
-  { 
+  {
     var left = node.left;
     switch (left.type)
     {
@@ -1787,7 +1787,7 @@ function jsCesk(cc)
       {
         var object = left.object;
         var frame = new MemberAssignmentKont(node, benva);
-        return kont.push(frame, new EvalState(object, benva, store));    
+        return kont.push(frame, new EvalState(object, benva, store));
       }
       default:
       {
@@ -1800,13 +1800,13 @@ function jsCesk(cc)
   {
     var closure = createClosure(node, benva);
     var closurea = a.closure(node, benva, store, kont);
-  
+
     var prototype = createObject(objectProtoRef);
     var prototypea = a.closureProtoObject(node, benva, store, kont);
     var closureRef = l.abst1(closurea);
     prototype = prototype.add(P_CONSTRUCTOR, closureRef);
     store = store.allocAval(prototypea, prototype);
-  
+
     closure = closure.add(P_PROTOTYPE, l.abst1(prototypea));
     store = store.allocAval(closurea, closure);
     return {store: store, ref: closureRef}
@@ -1835,15 +1835,15 @@ function jsCesk(cc)
   function evalCallExpression(node, benva, store, kont)
   {
     var calleeNode = node.callee;
-      
+
     if (Ast.isMemberExpression(calleeNode))
     { // TODO
       var cont = new Cont("meth", node, null, benva, methodOperatorCont);
       return evalNode(calleeNode.object, stack.addFirst(cont), benva, store, time);
     }
-    
+
     var frame = new OperatorKont(node, benva);
-    return kont.push(frame, new EvalState(calleeNode, benva, store));      
+    return kont.push(frame, new EvalState(calleeNode, benva, store));
   }
 
   function applyProc(node, operatorValue, operandValues, thisValue, benva, store, kont)
@@ -1876,19 +1876,19 @@ function jsCesk(cc)
     {
       return kont.pop(function (frame) {return new KontState(frame, L_UNDEFINED, store)});
     }
-    
+
     var formalParameters = funNode.params;
-  
-    var extendedBenv = createEnvironment(statica);    
+
+    var extendedBenv = createEnvironment(statica);
     extendedBenv = extendedBenv.add(P_THIS, l.abst1(thisa));
     for (var i = 0; i < formalParameters.length; i++)
     {
       var param = formalParameters[i];
       extendedBenv = extendedBenv.add(p.abst1(param.name), operandValues[i]);
-    }    
-    
+    }
+
     store = store.allocAval(extendedBenva, extendedBenv);
-    
+
     var frame = new BodyKont(bodyNode, 1, extendedBenva);
     return kont.push(frame, new EvalState(nodes[0], extendedBenva, store));
   }
@@ -1903,7 +1903,7 @@ function jsCesk(cc)
       store = store.updateAval(benva, benv);
       return kont.pop(function (frame) {return new ReturnState(node, benva, store, frame)});
     }
-    
+
     var frame = new ReturnKont(node, benva);
     return kont.push(frame, new EvalState(argumentNode, benva, store));
   }
@@ -1918,7 +1918,7 @@ function jsCesk(cc)
     }
     return kont.pop(function (frame) {return new ReturnState(node, returna, store, frame)});
   }
-  
+
   function applyKont(frame, value, store, kont)
   {
     if (frame.isMarker)
@@ -1941,12 +1941,12 @@ function jsCesk(cc)
     var frame = new IfKont(node, benva);
     return kont.push(frame, new EvalState(testNode, benva, store));
   }
-  
+
   function evalObjectExpression(node, benva, store, kont)
   {
-    var properties = node.properties;    
+    var properties = node.properties;
     if (properties.length === 0)
-    { 
+    {
       var obj = createObject(objectProtoRef);
       var objectAddress = a.object(node, null);
       store = store.allocAval(objectAddress, obj);
@@ -1954,9 +1954,9 @@ function jsCesk(cc)
       return kont.pop(function (frame) {return new KontState(frame, objectRef, store)});
     }
     var frame = new ObjectKont(node, 1, benva, []);
-    return kont.push(frame, new EvalState(properties[0].value, benva, store));    
+    return kont.push(frame, new EvalState(properties[0].value, benva, store));
   }
-  
+
   function evalMemberExpression(node, benva, store, kont)
   {
     var object = node.object;
@@ -1968,7 +1968,7 @@ function jsCesk(cc)
   {
     switch (node.type)
     {
-      case "Literal": 
+      case "Literal":
         return evalLiteral(node, benva, store, kont);
       case "Identifier":
         return evalIdentifier(node, benva, store, kont);
@@ -1998,40 +1998,40 @@ function jsCesk(cc)
         return evalUnaryExpression(node, benva, store, kont);
       case "ExpressionStatement":
         return evalNode(node.expression, benva, store, kont);
-      case "ReturnStatement": 
+      case "ReturnStatement":
         return evalReturnStatement(node, benva, store, kont);
-      case "BreakStatement": 
+      case "BreakStatement":
         return evalBreakStatement(node, benva, store, kont);
-      case "LabeledStatement": 
+      case "LabeledStatement":
         return evalLabeledStatement(node, benva, store, kont);
-      case "IfStatement": 
+      case "IfStatement":
         return evalIfStatement(node, benva, store, kont);
-      case "ConditionalExpression": 
+      case "ConditionalExpression":
         return evalConditionalExpression(node, benva, store, kont);
-      case "SwitchStatement": 
+      case "SwitchStatement":
         return evalSwitchStatement(node, benva, store, kont);
-      case "ForStatement": 
+      case "ForStatement":
         return evalForStatement(node, benva, store, kont);
-      case "WhileStatement": 
+      case "WhileStatement":
         return evalWhileStatement(node, benva, store, kont);
-      case "FunctionDeclaration": 
+      case "FunctionDeclaration":
         return evalFunctionDeclaration(node, benva, store, kont);
-      case "VariableDeclaration": 
+      case "VariableDeclaration":
         return evalVariableDeclaration(node, benva, store, kont);
-      case "VariableDeclarator": 
+      case "VariableDeclarator":
         return evalVariableDeclarator(node, benva, store, kont);
       case "BlockStatement":
         return evalStatementList(node, benva, store, kont);
       case "EmptyStatement":
         return evalEmptyStatement(node, benva, store, kont);
-      case "TryStatement": 
+      case "TryStatement":
         return evalTryStatement(node, benva, store, kont);
-      case "ThrowStatement": 
+      case "ThrowStatement":
         return evalThrowStatement(node, benva, store, kont);
       case "Program":
         return evalProgram(node, benva, store, kont);
       default:
-        throw new "cannot handle node " + node.type; 
+        throw new "cannot handle node " + node.type;
     }
   }
 
@@ -2040,15 +2040,15 @@ function jsCesk(cc)
   module.l = l;
   module.store = store;
   module.globala = globala;
-  
-  module.inject = 
+
+  module.inject =
     function (node, override)
     {
       override = override || {};
       var haltFrame = new HaltKont([globala]);
-      return new InitState(node, override.benva || globala, override.store || store, haltFrame);    
+      return new InitState(node, override.benva || globala, override.store || store, haltFrame);
     }
-  
-  return module; 
+
+  return module;
 }
 

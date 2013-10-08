@@ -15,7 +15,7 @@ function ContextAddr(base, context)
 {
   assertDefinedNotNull(base);
 //  assertDefinedNotNull(context);
-  this.base = base; 
+  this.base = base;
   this.context = context;
 }
 ContextAddr.prototype = Object.create(Addr.prototype);

@@ -8,28 +8,28 @@ function DefaultBenv()
     this.Call = [];
     this.PrimitiveValue = BOT;
    }
-  
+
   Benv.prototype.isBenv = true;
-  
+
   Benv.prototype.toString =
     function ()
     {
   //    return "<" + this.Class + ": " + this.frame.map(function (entry) {return entry[0] + "->" + entry[1]}).join("|") + ">";
       return "<" + this.Class + " " + this.names() + ">";
     };
-    
+
   Benv.prototype.nice =
     function ()
     {
       return "[[Class]] " + this.Class + "\n" + this.frame.map(function (entry) {return entry.name + " --> " + entry.value}).join("\n");
     }
-      
+
   Benv.prototype.accept =
     function (visitor)
     {
       return visitor.visitBenv(this);
     }
-  
+
 //  function updateFrame(frame, name, value)
 //  {
 //    var concNames = !!name.conc;
@@ -41,7 +41,7 @@ function DefaultBenv()
 //      for (var i = 0; i < frame.length; i++)
 //      {
 //        var entry = frame[i];
-//        var entryName = entry.name; 
+//        var entryName = entry.name;
 //        var c = entryName.compareTo(name);
 //        if (c <= 0)
 //        {
@@ -55,7 +55,7 @@ function DefaultBenv()
 //        {
 //          newFrame.push(entry);
 //        }
-//      }  
+//      }
 //      if (cleaned)
 //      {
 //        return newFrame.addFirst({name:name,value:value});
@@ -70,14 +70,14 @@ function DefaultBenv()
 //      return frame.addFirst({name:name,value:value});
 //    }
 //  }
-    
+
   function strongUpdateFrame(frame, name, value)
   {
     var newFrame = [];
     for (var i = 0; i < frame.length; i++)
     {
       var entry = frame[i];
-      var entryName = entry.name; 
+      var entryName = entry.name;
       var c = entryName.compareTo(name);
       if (c <= 0)
       {
@@ -89,14 +89,14 @@ function DefaultBenv()
     }
     return newFrame.addFirst({name:name, value:value});
   }
-    
+
   function weakUpdateFrame(frame, name, value)
   {
     var newFrame = [];
     for (var i = 0; i < frame.length; i++)
     {
       var entry = frame[i];
-      var entryName = entry.name; 
+      var entryName = entry.name;
       var c = entryName.compareTo(name);
       if (c <= 0)
       {
@@ -109,12 +109,12 @@ function DefaultBenv()
     }
     return newFrame.addFirst({name:name, value:value});
   }
-    
+
   Benv.prototype.add =
     function (name, value)
-    {  
+    {
       assertTrue(value instanceof JipdaValue || value === BOT, value);
-      
+
       var result = new Benv(this.Class);
 //      result.frame = !!name.conc ? strongUpdateFrame(this.frame, name, value) : weakUpdateFrame(this.frame, name, value);
       result.frame = strongUpdateFrame(this.frame, name, value);
@@ -125,7 +125,7 @@ function DefaultBenv()
       result.PrimitiveValue = this.PrimitiveValue;
       return result;
     }
-    
+
   Benv.prototype.lookup =
     function (name)
     {
@@ -133,7 +133,7 @@ function DefaultBenv()
       for (var i = 0; i < this.frame.length; i++)
       {
         var entry = this.frame[i];
-        var entryName = entry.name; 
+        var entryName = entry.name;
         var c = name.compareTo(entryName);
         if (c <= 0)
         {
@@ -142,20 +142,20 @@ function DefaultBenv()
       }
       return result;
     };
-      
+
   Benv.prototype.conc =
     function ()
     {
       return [this];
     }
-  
+
   Benv.prototype.join =
     function (other)
     {
       if (other === BOT)
       {
         return this;
-      }    
+      }
       var result = new Benv(this.Class.concat(other.Class).toSet());
       result.Call = this.Call.concat(other.Call).toSet();
       result.Prototype = this.Prototype.join(other.Prototype);
@@ -166,7 +166,7 @@ function DefaultBenv()
       result.frame = frame;
       return result;
     }
-  
+
 Benv.prototype.equals =
   function (x)
   {
@@ -180,8 +180,8 @@ Benv.prototype.subsumes =
     {
       return true;
     }
-    if (!this.Class.subsumes(x.Class) 
-        || !this.parents.subsumes(x.parents) 
+    if (!this.Class.subsumes(x.Class)
+        || !this.parents.subsumes(x.parents)
         || !this.Prototype.subsumes(x.Prototype)
         || !this.Call.subsumes(x.Call)
         || !this.PrimitiveValue.subsumes(x.PrimitiveValue))
@@ -268,20 +268,20 @@ Benv.prototype.compareTo =
     }
     return undefined;
   }
-  
-  Benv.prototype.names = 
+
+  Benv.prototype.names =
     function ()
     {
       return this.frame.map(function (entry) { return entry.name; }).toSet();
     }
-    
-//  Benv.prototype.values = 
+
+//  Benv.prototype.values =
 //    function ()
 //    {
 //      return this.frame.map(function (entry) { return entry.value; }).toSet();
 //    }
-  
-  Benv.prototype.addresses = 
+
+  Benv.prototype.addresses =
     function ()
     {
       var callAddresses = this.Call.flatMap(function (Call) {return Call.addresses()});
@@ -290,42 +290,42 @@ Benv.prototype.compareTo =
       var addresses = this.parents.concat(callAddresses).concat(prototypeAddresses).concat(frameAddresses).toSet();
       return addresses;
     }
-  
+
   Benv.prototype.isObject =
     function ()
     {
       return this.Class.indexOf(Ecma.Class.OBJECT) > -1;
     }
-  
+
   Benv.prototype.isArray =
     function ()
     {
       return this.Class.indexOf(Ecma.Class.ARRAY) > -1;
     }
-  
+
   Benv.prototype.isString =
     function ()
     {
       return this.Class.indexOf(Ecma.Class.STRING) > -1;
     }
-  
+
   Benv.prototype.isFunction =
     function ()
     {
       return this.Class.indexOf(Ecma.Class.FUNCTION) > -1;
     }
-  
+
   var module = {};
-  
+
   module.createEnvironment =
     function (parenta)
     {
       var benv = new Benv(["Env"]); // TODO introduce constant? (need a classifier here because of joining)
       benv.parents = [parenta]; // no ECMA internal property exists for 'outer environment' (10.2)
       benv.Prototype = BOT; // should be BOT and not abst(null) for example (when merging with other non-env Benvs)
-      return benv;    
+      return benv;
     }
-  
+
   module.createObject =
     function (Prototype)
     {
@@ -333,7 +333,7 @@ Benv.prototype.compareTo =
       benv.Prototype = Prototype;
       return benv;
     }
-  
+
   module.createString =
     function (prim, STRINGPA)
     {
@@ -342,7 +342,7 @@ Benv.prototype.compareTo =
       benv.PrimitiveValue = prim;
       return benv;
     }
-  
+
   module.createArray =
     function (ARRAYPA)
     {
@@ -359,6 +359,6 @@ Benv.prototype.compareTo =
       benv.Call = [Call];
       return benv;
     }
-  
+
   return module;
 }

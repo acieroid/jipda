@@ -22,7 +22,7 @@ Null.prototype.toString =
     return "()";
   }
 
-Null.prototype.valueOf = 
+Null.prototype.valueOf =
   function ()
   {
     return Null;
@@ -65,7 +65,7 @@ Pair.toList =
     {
       l = new Pair(arr[i], l);
     }
-    return l;  
+    return l;
   }
 
 Pair.prototype.equals =
@@ -81,7 +81,7 @@ Pair.prototype.hashCode =
     var result = 1;
     result = prime * result + this.car.hashCode();
     result = prime * result + this.cdr.hashCode();
-    return result;    
+    return result;
   }
 
 Pair.prototype.toString =
@@ -224,7 +224,7 @@ SchemeTokenizer.prototype.parse =
       case "(" : return this.parseList();
       case "'" : return this.parseQuote();
       case "\"" : return this.parseString();
-      case "#" : 
+      case "#" :
       {
         var d = this.reader.read();
         if (d === "t")
@@ -257,7 +257,7 @@ SchemeTokenizer.prototype.parse =
           po.sp = {pos:this.reader.pos, line:this.reader.line, linePos:this.reader.linePos, length:1};
           return po;
         }
-        return this.parseNumber(c); 
+        return this.parseNumber(c);
       }
       case "" : return null;
     }
@@ -422,7 +422,7 @@ SchemeTokenizer.prototype.parseVector =
     po.tag = ++__nodeCounter__;
     sp.length = this.reader.pos - sp.pos;
     po.sp = sp;
-    return po;    
+    return po;
   }
 
 SchemeTokenizer.prototype.skipWhitespace =

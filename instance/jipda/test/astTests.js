@@ -8,7 +8,7 @@ suiteAstTests.test1 =
 		var refA = ast.body[1].expression;
 		assertEquals([[varA]], scopeChain(refA, ast));
 	};
-	
+
 suiteAstTests.test2 =
 	function ()
 	{
@@ -76,7 +76,7 @@ suiteAstTests.test6 =
 		assertTrue(isVariable(varX));
 		var refX = $$$(ast).findReferenceIdentifiers("x").toNode();
 		assertTrue(isReference(refX));
-		assertEquals([[varX]], scopeChain(refX, ast));		
+		assertEquals([[varX]], scopeChain(refX, ast));
 		assertEquals(varX, lookupNodeDeclarationIdentifier(refX, ast));
 	};
 */
@@ -94,11 +94,11 @@ suiteAstTests.test6c =
     var refX = $$$(ast).findReferenceIdentifiers("x").toNode();
     assertTrue(isReferenceIdentifier(refX, ast));
     assertTrue(isConstReferenceIdentifier(refX, ast));
-    assertEquals([[varX]], scopeChain(refX, ast));    
+    assertEquals([[varX]], scopeChain(refX, ast));
     assertEquals(varX, lookupDeclarationIdentifier(refX.name, refX, ast));
   };
-	
-	
+
+
 suiteAstTests.test7 =
 	function ()
 	{
@@ -109,7 +109,7 @@ suiteAstTests.test7 =
 		assertFalse(enclosingBlock(ast, ast));
 		assertFalse(enclosingFunction(ast, ast));
 	}
-	
+
 suiteAstTests.test8 =
 	function ()
 	{
@@ -119,9 +119,9 @@ suiteAstTests.test8 =
 		assertEquals(funF.body, enclosingBlock(refX, ast));
 		assertEquals(funF, enclosingFunction(refX, ast));
 		assertFalse(enclosingBlock(ast, ast));
-		assertFalse(enclosingFunction(ast, ast));		
+		assertFalse(enclosingFunction(ast, ast));
 	}
-	
+
 suiteAstTests.test8fd =
 	function ()
 	{
@@ -131,9 +131,9 @@ suiteAstTests.test8fd =
 		assertEquals(funF.body, enclosingBlock(refX, ast));
 		assertEquals(funF, enclosingFunction(refX, ast));
 		assertFalse(enclosingBlock(ast, ast));
-		assertFalse(enclosingFunction(ast, ast));		
+		assertFalse(enclosingFunction(ast, ast));
 	}
-	
+
 suiteAstTests.test9 =
 	function ()
 	{
@@ -142,8 +142,8 @@ suiteAstTests.test9 =
 		assertEquals(2, varsX.length);
 		var refsX = $$$(ast).findReferenceIdentifiers("x").toArray();
 		assertEquals(2, refsX.length);
-		assertEquals([[], [varsX[0], varsX[1]]], scopeChain(refsX[0], ast));		
-		assertEquals([[varsX[0], varsX[1]]], scopeChain(refsX[1], ast));		
+		assertEquals([[], [varsX[0], varsX[1]]], scopeChain(refsX[0], ast));
+		assertEquals([[varsX[0], varsX[1]]], scopeChain(refsX[1], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[0], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[1], ast));
 	};
@@ -156,8 +156,8 @@ suiteAstTests.test10 =
 		assertEquals(2, varsX.length);
 		var refsX = $$$(ast).findReferenceIdentifiers("x").toArray();
 		assertEquals(2, refsX.length);
-		assertEquals([[], [varsX[0], varsX[1]]], scopeChain(refsX[0], ast));		
-		assertEquals([[varsX[0], varsX[1]]], scopeChain(refsX[1], ast));		
+		assertEquals([[], [varsX[0], varsX[1]]], scopeChain(refsX[0], ast));
+		assertEquals([[varsX[0], varsX[1]]], scopeChain(refsX[1], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[0], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[1], ast));
 	};
@@ -171,8 +171,8 @@ suiteAstTests.test11 =
 		assertEquals(2, varsX.length);
 		var refsX = $$$(ast).findReferenceIdentifiers("x").toArray();
 		assertEquals(2, refsX.length);
-		assertEquals([[], [varsX[1]], [varsX[0], varF]], scopeChain(refsX[0], ast));		
-		assertEquals([[varsX[0], varF]], scopeChain(refsX[1], ast));		
+		assertEquals([[], [varsX[1]], [varsX[0], varF]], scopeChain(refsX[0], ast));
+		assertEquals([[varsX[0], varF]], scopeChain(refsX[1], ast));
 		assertEquals(varsX[1], lookupNodeDeclarationIdentifier(refsX[0], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[1], ast));
 	};
@@ -186,8 +186,8 @@ suiteAstTests.test11fd =
 		assertEquals(2, varsX.length);
 		var refsX = $$$(ast).findReferenceIdentifiers("x").toArray();
 		assertEquals(2, refsX.length);
-		assertEquals([[], [varsX[1]], [varsX[0], varF]], scopeChain(refsX[0], ast));		
-		assertEquals([[varsX[0], varF]], scopeChain(refsX[1], ast));		
+		assertEquals([[], [varsX[1]], [varsX[0], varF]], scopeChain(refsX[0], ast));
+		assertEquals([[varsX[0], varF]], scopeChain(refsX[1], ast));
 		assertEquals(varsX[1], lookupNodeDeclarationIdentifier(refsX[0], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[1], ast));
 	};
@@ -200,8 +200,8 @@ suiteAstTests.test12 =
 		assertEquals(2, varsX.length);
 		var refsX = $$$(ast).findReferenceIdentifiers("x").toArray();
 		assertEquals(2, refsX.length);
-		assertEquals([[varsX[1]], [varsX[0]]], scopeChain(refsX[0], ast));		
-		assertEquals([[varsX[0]]], scopeChain(refsX[1], ast));		
+		assertEquals([[varsX[1]], [varsX[0]]], scopeChain(refsX[0], ast));
+		assertEquals([[varsX[0]]], scopeChain(refsX[1], ast));
 		assertEquals(varsX[1], lookupNodeDeclarationIdentifier(refsX[0], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[1], ast));
 	};
@@ -214,8 +214,8 @@ suiteAstTests.test13 =
 		assertEquals(2, varsX.length);
 		var refsX = $$$(ast).findReferenceIdentifiers("x").toArray();
 		assertEquals(2, refsX.length);
-		assertEquals([[], [varsX[0]]], scopeChain(refsX[0], ast));		
-		assertEquals([[varsX[0]]], scopeChain(refsX[1], ast));		
+		assertEquals([[], [varsX[0]]], scopeChain(refsX[0], ast));
+		assertEquals([[varsX[0]]], scopeChain(refsX[1], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[0], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[1], ast));
 	};
@@ -230,12 +230,12 @@ suiteAstTests.test14 =
 		assertEquals(2, varsX.length);
 		var refsX = $$$(ast).findReferenceIdentifiers("x").toArray();
 		assertEquals(2, refsX.length);
-		assertEquals([[], [varsX[1]], [varsX[0], varF]], scopeChain(refsX[0], ast)); // let = var		
-		assertEquals([[varsX[0], varF]], scopeChain(refsX[1], ast));		
+		assertEquals([[], [varsX[1]], [varsX[0], varF]], scopeChain(refsX[0], ast)); // let = var
+		assertEquals([[varsX[0], varF]], scopeChain(refsX[1], ast));
 		assertEquals(varsX[1], lookupNodeDeclarationIdentifier(refsX[0], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[1], ast));
 	};
-	
+
 suiteAstTests.test14fd =
 	function ()
 	{
@@ -245,8 +245,8 @@ suiteAstTests.test14fd =
 		assertEquals(2, varsX.length);
 		var refsX = $$$(ast).findReferenceIdentifiers("x").toArray();
 		assertEquals(2, refsX.length);
-		assertEquals([[], [varsX[1]], [varsX[0], varF]], scopeChain(refsX[0], ast)); // let = var		
-		assertEquals([[varsX[0], varF]], scopeChain(refsX[1], ast));		
+		assertEquals([[], [varsX[1]], [varsX[0], varF]], scopeChain(refsX[0], ast)); // let = var
+		assertEquals([[varsX[0], varF]], scopeChain(refsX[1], ast));
 		assertEquals(varsX[1], lookupNodeDeclarationIdentifier(refsX[0], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[1], ast));
 	};
@@ -261,8 +261,8 @@ suiteAstTests.test15 =
 		assertEquals(2, varsX.length);
 		var refsX = $$$(ast).findReferenceIdentifiers("x").toArray();
 		assertEquals(2, refsX.length);
-		assertEquals([[], [], [varsX[0], varF]], scopeChain(refsX[0], ast));		
-		assertEquals([[varsX[0], varF]], scopeChain(refsX[1], ast));		
+		assertEquals([[], [], [varsX[0], varF]], scopeChain(refsX[0], ast));
+		assertEquals([[varsX[0], varF]], scopeChain(refsX[1], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[0], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[1], ast));
 	};
@@ -276,8 +276,8 @@ suiteAstTests.test15fd =
 		assertEquals(2, varsX.length);
 		var refsX = $$$(ast).findReferenceIdentifiers("x").toArray();
 		assertEquals(2, refsX.length);
-		assertEquals([[], [], [varsX[0], varF]], scopeChain(refsX[0], ast));		
-		assertEquals([[varsX[0], varF]], scopeChain(refsX[1], ast));		
+		assertEquals([[], [], [varsX[0], varF]], scopeChain(refsX[0], ast));
+		assertEquals([[varsX[0], varF]], scopeChain(refsX[1], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[0], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[1], ast));
 	};
@@ -293,8 +293,8 @@ suiteAstTests.test16 =
 		assertEquals(2, varsX.length);
 		var refsX = $$$(ast).findReferenceIdentifiers("x").toArray();
 		assertEquals(2, refsX.length);
-		assertEquals([[], [varP, varsX[1]], [varsX[0], varF]], scopeChain(refsX[0], ast)); // let = var		
-		assertEquals([[varsX[0], varF]], scopeChain(refsX[1], ast));		
+		assertEquals([[], [varP, varsX[1]], [varsX[0], varF]], scopeChain(refsX[0], ast)); // let = var
+		assertEquals([[varsX[0], varF]], scopeChain(refsX[1], ast));
 		assertEquals(varsX[1], lookupNodeDeclarationIdentifier(refsX[0], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[1], ast));
 	};
@@ -309,12 +309,12 @@ suiteAstTests.test16fd =
 		assertEquals(2, varsX.length);
 		var refsX = $$$(ast).findReferenceIdentifiers("x").toArray();
 		assertEquals(2, refsX.length);
-		assertEquals([[], [varP, varsX[1]], [varsX[0], varF]], scopeChain(refsX[0], ast)); // let = var		
-		assertEquals([[varsX[0], varF]], scopeChain(refsX[1], ast));		
+		assertEquals([[], [varP, varsX[1]], [varsX[0], varF]], scopeChain(refsX[0], ast)); // let = var
+		assertEquals([[varsX[0], varF]], scopeChain(refsX[1], ast));
 		assertEquals(varsX[1], lookupNodeDeclarationIdentifier(refsX[0], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[1], ast));
 	};
-	
+
 suiteAstTests.test17 =
 	function ()
 	{
@@ -324,7 +324,7 @@ suiteAstTests.test17 =
 		var refsX = $$$(ast).findReferenceIdentifiers("x").toArray();
 		assertEquals(2, refsX.length);
 		assertEquals([[varsX[1]], [varsX[0]]], scopeChain(refsX[0], ast));
-		assertEquals([[varsX[0]]], scopeChain(refsX[1], ast));		
+		assertEquals([[varsX[0]]], scopeChain(refsX[1], ast));
 		assertEquals(varsX[1], lookupNodeDeclarationIdentifier(refsX[0], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[1], ast));
 	};
@@ -337,8 +337,8 @@ suiteAstTests.test18 =
 		assertEquals(2, varsX.length);
 		var refsX = $$$(ast).findReferenceIdentifiers("x").toArray();
 		assertEquals(2, refsX.length);
-		assertEquals([[], [varsX[0], varsX[1]]], scopeChain(refsX[0], ast));		
-		assertEquals([[varsX[0], varsX[1]]], scopeChain(refsX[1], ast));		
+		assertEquals([[], [varsX[0], varsX[1]]], scopeChain(refsX[0], ast));
+		assertEquals([[varsX[0], varsX[1]]], scopeChain(refsX[1], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[0], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[1], ast));
 	};
@@ -402,8 +402,8 @@ suiteAstTests.test21 =
 		assertEquals(2, varsX.length);
 		var refsX = $$$(ast).findReferenceIdentifiers("x").toArray();
 		assertEquals(2, refsX.length);
-		assertEquals([[varsX[1]], [varsX[0]]], scopeChain(refsX[0], ast));		
-		assertEquals([[varsX[0]]], scopeChain(refsX[1], ast));		
+		assertEquals([[varsX[1]], [varsX[0]]], scopeChain(refsX[0], ast));
+		assertEquals([[varsX[0]]], scopeChain(refsX[1], ast));
 		assertEquals(varsX[1], lookupNodeDeclarationIdentifier(refsX[0], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[1], ast));
 	};
@@ -417,13 +417,13 @@ suiteAstTests.test22 =
 		assertEquals(2, varsX.length);
 		var refsX = $$$(ast).findReferenceIdentifiers("x").toArray();
 		assertEquals(2, refsX.length);
-		assertEquals([[varsX[0]]], scopeChain(refsX[0], ast));		
-		assertEquals([[varsX[1]], [varsX[0]]], scopeChain(refsX[1], ast));		
+		assertEquals([[varsX[0]]], scopeChain(refsX[0], ast));
+		assertEquals([[varsX[1]], [varsX[0]]], scopeChain(refsX[1], ast));
 		assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[0], ast));
 		assertEquals(varsX[1], lookupNodeDeclarationIdentifier(refsX[1], ast));
 	};
 */
-	
+
 suiteAstTests.test23 =
 	function ()
 	{
@@ -432,7 +432,7 @@ suiteAstTests.test23 =
 		assertEquals(2, varsX.length);
 		var refsX = $$$(ast).findReferenceIdentifiers("x").toArray();
 		assertEquals(1, refsX.length);
-		assertEquals([[], [], [varsX[0], varsX[1]]], scopeChain(refsX[0], ast));				
+		assertEquals([[], [], [varsX[0], varsX[1]]], scopeChain(refsX[0], ast));
 	};
 
 suiteAstTests.test24 =
@@ -443,7 +443,7 @@ suiteAstTests.test24 =
     assertEquals(2, varsX.length);
     var refsX = $$$(ast).findReferenceIdentifiers("x").toArray();
     assertEquals(1, refsX.length);
-    assertEquals([[], [varsX[1]], [varsX[0]]], scopeChain(refsX[0], ast));        
+    assertEquals([[], [varsX[1]], [varsX[0]]], scopeChain(refsX[0], ast));
   };
 
 suiteAstTests.test25 =
@@ -452,7 +452,7 @@ suiteAstTests.test25 =
     var ast = createAst("var a;");
     assertEquals("var a;", ast.toString());
   };
-  
+
 suiteAstTests.test26 =
   function ()
   {
@@ -462,11 +462,11 @@ suiteAstTests.test26 =
     assertEquals(2, varsX.length);
     var refsX = $$$(ast).findReferenceIdentifiers("x").toArray();
     assertEquals(4, refsX.length);
-    assertEquals([[], [varsX[0], varsX[1]]], scopeChain(refsX[0], ast));    
-    assertEquals([[], [varsX[0], varsX[1]]], scopeChain(refsX[1], ast));    
+    assertEquals([[], [varsX[0], varsX[1]]], scopeChain(refsX[0], ast));
+    assertEquals([[], [varsX[0], varsX[1]]], scopeChain(refsX[1], ast));
     assertEquals([[], [varE], [varsX[0], varsX[1]]], scopeChain(refsX[2], ast));
     assertEquals(["block","catch","fun"], scopeChain(refsX[2], ast).map(function (x) {return x.kind}));
-    assertEquals([[varsX[0], varsX[1]]], scopeChain(refsX[3], ast));    
+    assertEquals([[varsX[0], varsX[1]]], scopeChain(refsX[3], ast));
     assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[0], ast));
     assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[1], ast));
     assertEquals(varsX[0], lookupNodeDeclarationIdentifier(refsX[2], ast));
@@ -480,16 +480,15 @@ suiteAstTests.test27 =
     var varX = $$$(ast).findDeclarationIdentifiers("x").toNode();
     var varE = $$$(ast).findDeclarationIdentifiers("e").toNode();
     var refE = $$$(ast).findReferenceIdentifiers("e").toNode();
-    assertEquals([[], [varE], [varX]], scopeChain(refE, ast));    
+    assertEquals([[], [varE], [varX]], scopeChain(refE, ast));
   };
 
 suiteAstTests.test28 =
   function ()
   {
     var ast = createAst("var x;");
-    assertEquals(4, nodes(ast).length);    
+    assertEquals(4, nodes(ast).length);
   };
 
 
 
-  

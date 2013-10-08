@@ -13,7 +13,7 @@ var suiteBenvTests = new TestSuite("benvTests");
 //    assertEquals("[]", benv.lookup(lat.abst([3])).addresses);
 //    assertFalse(benv.lookup(lat.abst([3])).directMatch);
 //  };
-//  
+//
 //suiteBenvTests.test2 =
 //  function ()
 //  {
@@ -30,7 +30,7 @@ var suiteBenvTests = new TestSuite("benvTests");
 //    assertEquals("[]", benv.lookup(lat.abst([3])).addresses);
 //    assertFalse(benv.lookup(lat.abst([3])).directMatch);
 //  };
-//  
+//
 //suiteBenvTests.test3 =
 //  function ()
 //  {
@@ -49,7 +49,7 @@ var suiteBenvTests = new TestSuite("benvTests");
 //    assertEquals("[]", benv.lookup(lat.abst([3])).addresses);
 //    assertFalse(benv.lookup(lat.abst([3])).directMatch);
 //  };
-//        
+//
 //suiteBenvTests.test4 =
 //  function ()
 //  {
@@ -71,7 +71,7 @@ var suiteBenvTests = new TestSuite("benvTests");
 //    assertEquals("[]", benv.lookup(lat.abst([99])).addresses);
 //    assertFalse(benv.lookup(lat.abst([99])).directMatch);
 //  };
-//          
+//
 //suiteBenvTests.test5 =
 //  function ()
 //  {
@@ -100,7 +100,7 @@ var suiteBenvTests = new TestSuite("benvTests");
 //    var n2 = lat.abst(["g"]);
 //    benv = benv.add(n1, 1);
 //    benv = benv.add(n2, 2);
-//    benv = benv.add(n1, 3);    
+//    benv = benv.add(n1, 3);
 //    assertEquals("[{g},{f}]", benv.names());
 //    assertEquals("[3,1]", benv.lookup(n1).addresses);
 //  }
@@ -115,7 +115,7 @@ var suiteBenvTests = new TestSuite("benvTests");
 //    var n2 = lat.abst(["g"]);
 //    benv = benv.add(n2, 2);
 //    benv = benv.add(n1, 1);
-//    benv = benv.add(n1, 3);    
+//    benv = benv.add(n1, 3);
 //    assertEquals("[{f},{g}]", benv.names());
 //    assertEquals("[3,1]", benv.lookup(n1).addresses);
 //  }

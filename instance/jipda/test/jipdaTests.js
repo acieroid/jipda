@@ -1,6 +1,6 @@
-var suiteJipdaTests = 
+var suiteJipdaTests =
 
-(function () 
+(function ()
 {
   var module = new TestSuite("suiteJipdaTests");
 
@@ -11,20 +11,20 @@ var suiteJipdaTests =
     var actual = result.stepFwOver(result.initial).map(function (q) {return q.value}).reduce(Lattice.join, BOT);
     assertEquals(expected, actual);
   }
-  
+
   function createCesk(cc)
   {
     cc = cc || {};
     return jsCesk({a:cc.a || tagAg, p:cc.p || new Lattice1()});
   }
-  
+
   module.test1a =
     function ()
     {
       var cesk = createCesk();
       run("42", cesk, cesk.l.abst1(42));
     }
-    
+
    module.test12a =
   	function ()
   	{
@@ -35,7 +35,7 @@ var suiteJipdaTests =
 //      assertEquals(jipda.lattice.abst([25, 30, 36]), actual);
       // now: extended benv directly takes x to value, and extended benv is allocated as (application, time)
   	}
-//  
+//
 //  module.test12b =
 //  	function ()
 //  	{
@@ -45,7 +45,7 @@ var suiteJipdaTests =
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
 //  		assertEquals(jipda.lattice.abst1(36), actual);
 //  	};
-//  
+//
 //  module.test13 =
 //  	function ()
 //  	{
@@ -55,7 +55,7 @@ var suiteJipdaTests =
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
 //  		assertEquals(jipda.lattice.abst1(36), actual);
 //  	};
-//  
+//
   module.test19a =
   	function ()
   	{
@@ -63,7 +63,7 @@ var suiteJipdaTests =
       var cesk = createCesk();
       run(src, cesk, cesk.l.abst1("done"));
   	}
-  	
+
 //  module.test19b =
 //  	function ()
 //  	{
@@ -73,7 +73,7 @@ var suiteJipdaTests =
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
 //  		assertEquals(jipda.lattice.abst1("done"), actual);
 //  	};
-  	
+
  module.test20a =
    function ()
    {
@@ -81,7 +81,7 @@ var suiteJipdaTests =
      var cesk = createCesk();
      run(src, cesk, BOT);
    }
- 
+
  module.test20b =
    function ()
    {
@@ -89,8 +89,8 @@ var suiteJipdaTests =
      var cesk = createCesk();
      run(src, cesk, BOT);
    }
-   
-  	
+
+
 //  module.test26a =
 //  	function ()
 //  	{
@@ -100,7 +100,7 @@ var suiteJipdaTests =
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
 //  		assertEquals(jipda.lattice.abst([4,5]), actual); // concrete: 4
 //  	};
-//  	
+//
 //  module.test26b =
 //  	function ()
 //  	{
@@ -110,7 +110,7 @@ var suiteJipdaTests =
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
 //  		assertEquals(jipda.lattice.abst1(4), actual);
 //  	};
-//  	
+//
 //  module.test27a =
 //  	function ()
 //  	{
@@ -122,7 +122,7 @@ var suiteJipdaTests =
 //  		assertEquals(lat.Top, actual.user); /// mmm...
 //  		assertEquals([], actual.as);
 //  	};
-//  	
+//
 //  module.test27b =
 //  	function ()
 //  	{
@@ -134,7 +134,7 @@ var suiteJipdaTests =
 //      // concrete: true
 //  		assertEquals(jipda.lattice.abst([false, true]), actual);
 //  	};
-//  	
+//
 //  module.test27c =
 //  	function ()
 //  	{
@@ -149,7 +149,7 @@ var suiteJipdaTests =
 //  		var actual2 = global.lookup(lat.abst1("c")).value;
 //  		assertEquals(jipda.lattice.abst1(true), actual2);
 //  	};
-//  	
+//
 //  module.test61a =
 //  	function ()
 //  	{
@@ -158,8 +158,8 @@ var suiteJipdaTests =
 //      var result = jipda.evalNode(ast);
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
 //  		assertEquals(jipda.lattice.abst1(2), actual);
-//  	}	
-//  
+//  	}
+//
 //  module.test61aa =
 //  	function ()
 //  	{
@@ -170,8 +170,8 @@ var suiteJipdaTests =
 //      assertEquals(lat.Top, actual.user);
 //      assertEquals([], actual.as);
 //  		// time is limiting factor: 3 iterations have same var i, but timestamps [], [x], [x,y]
-//  	}	
-//  
+//  	}
+//
 //  module.test61b =
 //  	function ()
 //  	{
@@ -181,8 +181,8 @@ var suiteJipdaTests =
 //      var result = jipda.evalNode(ast);
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
 //  		assertEquals(jipda.lattice.abst1(3), actual);
-//  	}	
-//  
+//  	}
+//
 //  module.test61bb =
 //  	function ()
 //  	{
@@ -193,8 +193,8 @@ var suiteJipdaTests =
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
 //      assertEquals(lat.Top, actual.user);
 //      assertEquals([], actual.as);
-//  	}	
-//  
+//  	}
+//
 //  module.test64 =
 //    function ()
 //    {
@@ -203,8 +203,8 @@ var suiteJipdaTests =
 //      var result = jipda.evalNode(ast);
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
 //      assertEquals(BOT, actual);
-//    } 
-//  
+//    }
+//
 //  module.test65 =
 //    function ()
 //    {
@@ -214,8 +214,8 @@ var suiteJipdaTests =
 //      var result = jipda.evalNode(ast);
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
 //      //assertEquals("{100}", actual);
-//    } 
-//  
+//    }
+//
 //  module.test76a =
 //    function ()
 //    {
@@ -225,9 +225,9 @@ var suiteJipdaTests =
 //      var jipda = new Jipda({lattice: lat, k:0, a: tagAg});
 //      var result = jipda.evalNode(ast);
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
-//      assertEquals(jipda.lattice.abst1(10), actual); 
+//      assertEquals(jipda.lattice.abst1(10), actual);
 //    }
-//  
+//
 //  module.test76b =
 //    function ()
 //    {
@@ -236,9 +236,9 @@ var suiteJipdaTests =
 //      var lat = new LatN(1);var jipda = new Jipda({lattice: lat, k:0, a: tagAg});
 //      var result = jipda.evalNode(ast);
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
-//      assertEquals(jipda.lattice.abst1(10), actual); 
+//      assertEquals(jipda.lattice.abst1(10), actual);
 //    }
-//  
+//
 //  module.test78a =
 //    function ()
 //    {
@@ -252,7 +252,7 @@ var suiteJipdaTests =
 ////      assertEquals(jipda.lattice.abst1(1), actual); // threaded heap: {1}, single-threaded heap: {1,0}
 //      assertEquals(jipda.lattice.abst1(1), actual);
 //    }
-//  
+//
 //  module.test79a =
 //    function ()
 //    {
@@ -263,7 +263,7 @@ var suiteJipdaTests =
 ////      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
 //      var result = jipda.evalNode(ast);
 //    }
-//  
+//
 //  module.test79b =
 //    function ()
 //    {
@@ -275,7 +275,7 @@ var suiteJipdaTests =
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
 //      assertEquals(jipda.lattice.abst1(true), actual);
 //    }
-//  
+//
 //  module.test80 =
 //    function ()
 //    {
@@ -287,7 +287,7 @@ var suiteJipdaTests =
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
 //      assertEquals(jipda.lattice.abst1(true), actual);
 //    }
-//  
+//
 //  module.test81a =
 //    function ()
 //    {
@@ -297,9 +297,9 @@ var suiteJipdaTests =
 //      var lat = new LatN(1);var jipda = new Jipda({lattice: lat, k:1, a: tagAg});
 //      var result = jipda.evalNode(ast);
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
-//      //assertEquals(jipda.lattice.abst1(true), actual); TODO when abstract printer       
+//      //assertEquals(jipda.lattice.abst1(true), actual); TODO when abstract printer
 //    }
-//  
+//
 //  module.test81b =
 //    function ()
 //    {
@@ -309,9 +309,9 @@ var suiteJipdaTests =
 //      var lat = new LatN(1);var jipda = new Jipda({lattice: lat, k:1, a: tagAg});
 //      var result = jipda.evalNode(ast);
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
-//      assertEquals(jipda.lattice.abst1(27), actual);       
+//      assertEquals(jipda.lattice.abst1(27), actual);
 //    }
-//  
+//
 //  module.test81c =
 //    function ()
 //    {
@@ -320,9 +320,9 @@ var suiteJipdaTests =
 //      var lat = new LatN(1);var jipda = new Jipda({lattice: lat, k:1, a: tagAg});
 //      var result = jipda.evalNode(ast);
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
-//      assertEquals(jipda.lattice.abst1(9), actual);       
+//      assertEquals(jipda.lattice.abst1(9), actual);
 //    }
-//  
+//
 //  module.test82 =
 //    function ()
 //    {
@@ -331,9 +331,9 @@ var suiteJipdaTests =
 //      var lat = new LatN(2);var jipda = new Jipda({lattice: lat, k:1, a: tagAg});
 //      var result = jipda.evalNode(ast);
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
-//      assertEquals(jipda.lattice.abst([1,2]), actual);           
+//      assertEquals(jipda.lattice.abst([1,2]), actual);
 //    }
-//  
+//
 //  module.test83 =
 //    function ()
 //    {
@@ -343,9 +343,9 @@ var suiteJipdaTests =
 //      var jipda = new Jipda({lattice: lat, k:0, a: tagAg});
 //      var result = jipda.evalNode(ast);
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
-//      assertEquals(lat.Num, actual.user);           
+//      assertEquals(lat.Num, actual.user);
 //    }
-//  
+//
 //  module.test84 =
 //    function ()
 //    {
@@ -355,27 +355,27 @@ var suiteJipdaTests =
 //      var jipda = new Jipda({lattice: lat, k:0, a: tagAg});
 //      var result = jipda.evalNode(ast);
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
-//      assertEquals(lat.Num, actual.user);           
+//      assertEquals(lat.Num, actual.user);
 //    }
-//  
+//
 //  module.test85 =
 //    function ()
 //    {
 //      var src = "var num = $join(1,2); function fib(n) {if (n<2) {return n} else {return fib(n-1)+fib(n-2)}}; fib(num);";
 //      var ast = createAst(src);
-//      var lat = new Lattice1(); 
+//      var lat = new Lattice1();
 //      var jipda = new Jipda({lattice: lat, k:0, a: tagAg});
 //      var result = jipda.evalNode(ast);
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
-//      assertEquals(lat.Num, actual.user);           
+//      assertEquals(lat.Num, actual.user);
 //    }
-//  
+//
 //  module.test86 =
 //    function ()
 //    {
 //      var src = read("test/resources/nssetup.js");
 //      var ast = createAst(src);
-//      var lat = new Lattice1(); 
+//      var lat = new Lattice1();
 //      var jipda = new Jipda({lattice: lat, k:2, a: tagAg}); // for k < 2, we always join same scope (extended benv) for reset()
 //      var result = jipda.evalNode(ast);
 //      var actual = result.map(State.topOfStack).reduce(Lattice.join, BOT);
@@ -385,15 +385,15 @@ var suiteJipdaTests =
 //      assertTrue(slv.addresses().length === 1);
 //      assertTrue(slv.user === BOT);
 //    }
-    
+
     module.testGcIpd =
       function ()
       {
         var src = read("test/resources/gcIpdExample.js");
         var cesk = createCesk()
         run(src, cesk, cesk.l.product(cesk.p.NUMBER, []));
-      }  	
-  	
+      }
+
     module.testRotate =
       function ()
       {
@@ -401,7 +401,7 @@ var suiteJipdaTests =
         var cesk = createCesk({p:new SetLattice(3)});
         run(src, cesk, cesk.l.abst([5, true, "hallo"]));
       }
-    
+
     module.testFac =
       function ()
       {
@@ -409,7 +409,7 @@ var suiteJipdaTests =
         var cesk = createCesk();
         run(src, cesk, cesk.l.product(cesk.p.NUMBER, []));
       }
-    
+
     module.testFib =
       function ()
       {
@@ -417,7 +417,7 @@ var suiteJipdaTests =
         var cesk = createCesk();
         run(src, cesk, cesk.l.product(cesk.p.NUMBER, []));
       }
-          
+
     module.test100 =
       function ()
       {
@@ -425,7 +425,7 @@ var suiteJipdaTests =
         var cesk = createCesk();
         run(src, cesk, cesk.l.abst([true, false]));
       }
-    
+
     module.test101 =
       function ()
       {
@@ -433,18 +433,18 @@ var suiteJipdaTests =
         var cesk = createCesk();
         run(src, cesk, cesk.l.product(cesk.p.NUMBER, []));
       }
-    
+
 //    module.testChurchNums =
 //    function ()
 //    {
 //      var src = read("test/resources/churchNums.js");
 //      var c = Pushdown.context({p:new Lattice1(), a:tagAg});
 //      run(src, c, c.l.abst([true, false]));
-//    }    
-    
-    
+//    }
+
+
     // simplest of GC tests
-//    
+//
 //    function f(x)
 //    {
 //        return x;
@@ -458,7 +458,7 @@ var suiteJipdaTests =
 //    g(1);
 //    g(2);
     //
-      
+
   return module;
 
 })()

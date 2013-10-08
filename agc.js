@@ -19,7 +19,7 @@ Agc.addressesReachable =
     return reachable;
   }
 
-Agc.addressReachable = 
+Agc.addressReachable =
   function (address, store, reachable)
   {
     if (!(address instanceof Addr))

@@ -31,7 +31,7 @@ Analysis.prototype.declarations =
 Analysis.prototype.isPureFunction =
   function (f)
   {
-    
+
     function filterMarks(etg, f)
     {
       return etg.edges().reduce(
@@ -43,12 +43,12 @@ Analysis.prototype.isPureFunction =
     }
 
     var dsg = this.dsg;
-    
+
     var globalReadAddresses = ArraySet.from(filterMarks(dsg.etg, function (mark) {return mark.isRead}).map(function (mark) {return mark.address}));
     var globalWriteAddresses = ArraySet.from(filterMarks(dsg.etg, function (mark) {return mark.isWrite}).map(function (mark) {return mark.address}));
     var constants = globalReadAddresses.subtract(globalWriteAddresses);
     print("constants", constants);
-    
+
     var objectAllocStates = dsg.etg.nodes().filter(function (s) {return s.node && s.node.type === "ObjectExpression"});
     var allocs = objectAllocStates.reduce(
       function (result, s)
@@ -56,7 +56,7 @@ Analysis.prototype.isPureFunction =
         var valueStates = dsg.values(s);
         var value = valueStates.map(function (q) {return q.value}).reduce(Lattice.join, BOT);
         var allocatedAddresses = ArraySet.from(value.addresses());
-        var executions = dsg.executions(s); 
+        var executions = dsg.executions(s);
         return executions.reduce(
           function (result, execution)
           {
@@ -64,7 +64,7 @@ Analysis.prototype.isPureFunction =
           }, result);
       }, LatticeMap.empty(ArraySet.empty()));
     print("allocs", allocs);
-    
+
     var objectAllocStates = dsg.etg.nodes().filter(function (s) {return s.node && s.node.type === "ObjectExpression"});
     var tallocs = objectAllocStates.reduce(
       function (result, s)
@@ -72,7 +72,7 @@ Analysis.prototype.isPureFunction =
         var valueStates = dsg.values(s);
         var value = valueStates.map(function (q) {return q.value}).reduce(Lattice.join, BOT);
         var allocatedAddresses = ArraySet.from(value.addresses());
-        var cflows = dsg.cflows(s); 
+        var cflows = dsg.cflows(s);
         print("talloc", s, cflows);
         return cflows.reduce(
           function (result, cflow)
@@ -81,7 +81,7 @@ Analysis.prototype.isPureFunction =
           }, result);
       }, LatticeMap.empty(ArraySet.empty()));
     print("tallocs", tallocs);
-    
+
     var rws = dsg.etg.edges().reduce(
       function (result, e)
       {
