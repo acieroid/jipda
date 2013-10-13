@@ -5,7 +5,8 @@ function repl(cc)
   var name = cc.name || "psipda";
   var cesk = pschemeCesk({a:cc.a || tagAg,
                           p:cc.p || new Lattice1(),
-                          t:cc.t || tagTg});
+                          t:cc.t || tagTg,
+                          h:cc.h || unboundedHistory});
   var src = "\"I am " + name + "\"";
   var store = cesk.store;
   var driver = new Pushdown();

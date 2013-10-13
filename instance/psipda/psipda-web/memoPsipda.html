@@ -11,7 +11,8 @@
 	<script type="text/javascript" src="../../../lattice/setLattice.js"></script>
 	<script type="text/javascript" src="../../../address/address.js"></script>
 	<script type="text/javascript" src="../../../address/tagAg.js"></script>
-	<script type="text/javascript" src="../../../tid/tagTg.js"></script>
+	<script type="text/javascript" src="../../../thread/tagTg.js"></script>
+	<script type="text/javascript" src="../../../thread/unboundedHistory.js"></script>
 	<script type="text/javascript" src="../../../ast/scheme.js"></script>
 	<script type="text/javascript" src="../../../store/store.js"></script>
 	<script type="text/javascript" src="../../../cesk/cesk.js"></script>
@@ -44,7 +45,7 @@
 /*     }
  */    var lat = new Lattice1();
     //var lat = new SetLattice(3);
-    var cesk = pschemeCesk({a:tagAg, p:lat, t:tagTg, memo:true});
+    var cesk = pschemeCesk({a:tagAg, p:lat, t:tagTg, h:unboudedHistory, memo:true});
     var result = new Pushdown().analyze(ast, cesk);
     var resultValue = result.stepFwOver(result.initial).map(function (q) {return q.value}).reduce(Lattice.join, BOT);
 		$("#resultValue").text(resultValue + " (states " + result.etg.nodes().length + ", edges " + result.etg.edges().length + ")");

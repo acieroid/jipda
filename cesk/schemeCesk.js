@@ -786,17 +786,11 @@ function schemeCesk(cc)
       {
         throw new Error("cannot set! an undefined identifier");
       }
-      console.log("length: " + as);
       /* update the values */
       while (as.length > 0)
       {
         var a = as.shift();
         var benv = store.lookupAval(a);
-        /* TODO: the environment should be a mapping from names to
-         * addresses, and we need to update value stored at the
-         * corresponding address instead of updating the environment,
-         * else something like ((lambda (x) ((lambda (y) (set! y 1))
-         * x) x) 0) will return 0 instead of 1 */
         benv = benv.add(name, value);
         store = store.updateAval(a, benv);
       }
