@@ -10,14 +10,14 @@
 	<script type="text/javascript" src="../../../lattice/lattice1.js"></script>
 	<script type="text/javascript" src="../../../lattice/setLattice.js"></script>
 	<script type="text/javascript" src="../../../address/address.js"></script>
-	<script type="text/javascript" src="../../../address/tagAg.js"></script>
 	<script type="text/javascript" src="../../../ast/scheme.js"></script>
 	<script type="text/javascript" src="../../../store/store.js"></script>
-	<script type="text/javascript" src="../../../cesk/cesk.js"></script>
-	<script type="text/javascript" src="../../../cesk/schemeCesk.js"></script>
+	<script type="text/javascript" src="../../../cesk/cs/schemeCesk.js"></script>
+	<script type="text/javascript" src="../../../cesk/cs/monoTagAg.js"></script>
+	<script type="text/javascript" src="../../../cesk/cs/1cfaTagAg.js"></script>
+	<script type="text/javascript" src="../../../cesk/cs/benv.js"></script>
 	<script type="text/javascript" src="../../../driver/graph.js"></script>
 	<script type="text/javascript" src="../../../driver/pushdown.js"></script>
-	<script type="text/javascript" src="../benv.js"></script>
 	<script type="text/javascript" src="../sipda.js"></script>
 	<script type="text/javascript" src="../../../lib/web/jquery-1.7.2.min.js"></script>
 	<script type="text/javascript" src="../../../lib/web/ace/ace.js"></script>
@@ -26,7 +26,7 @@
 	<script type="text/javascript">
 
 	// define print method for SIPDA
-   var print = function () { console.log(Array.prototype.slice.call(arguments).join(" ")) }		
+  var print = function () { console.log(Array.prototype.slice.call(arguments).join(" ")) }		
 	var editor;
 	 
 	function doIt()
@@ -45,10 +45,16 @@
 /*     }
  */    var lat = new Lattice1();
     //var lat = new SetLattice(3);
-    var cesk = schemeCesk({a:tagAg, p:lat});
-    var result = new Pushdown().analyze(ast, cesk);
-    var resultValue = result.stepFwOver(result.initial).map(function (q) {return q.value || BOT}).reduce(Lattice.join, BOT);
-		$("#resultValue").text(resultValue + " (states " + result.etg.nodes().length + ", edges " + result.etg.edges().length + ")");
+    var ag = eval($("#alloc").val());
+    var gc = $("#gc").prop("checked");
+    var memo = $("#memo").prop("checked");
+    var cesk = schemeCesk({a:ag, p:lat, gc:gc, memo:memo});
+    var driver = new Pushdown();
+    var start = Date.now();
+		var result = driver.analyze(ast, cesk);
+    var end = Date.now();
+		var resultValue = result.stepFwOver(result.initial).map(function (q) {return q.value}).reduce(Lattice.join, BOT);
+		$("#resultValue").text(resultValue + " (states " + result.etg.nodes().length + ", edges " + result.etg.edges().length + ", time " + (end-start) + ")");
     var etgEdges = result.etg.edges();
     var emptySet = ArraySet.empty();
     var meta = result.ss.entries().reduce(function (acc, entry) {return acc.put(entry.key, {ss:entry.value})}, HashMap.empty());
@@ -64,13 +70,24 @@
 	  editor = ace.edit("editor");
 	  editor.getSession().setMode("ace/mode/scheme");
 	})
-		
+	
 	</script>
 </head>
 
 <body>
-	<div id="editor" style="width: 640px; height: 320px;"></div>
-	<div id="manip" style="">
+	<div id="editor" style="width: 640px; height: 320px; float:left;"></div>
+	<div id="config" style="min-width: 320px; height: 320px; margin: 1em">
+		<div title="garbage collection">gc<input type="checkbox" id="gc" checked="true"/></div>
+		<div title="memoization">memo<input type="checkbox" id="memo"/></div>
+		<div title="address allocator">
+			alloc
+			<select id="alloc">
+				<option value="createMonoTagAg()">0CFA</option>
+				<option value="create1cfaTagAg()">1CFA</option>
+			</select>
+		</div>
+  </div>
+	<div id="manip" style="clear:both">
 		<button id="eval" name="eval" onClick="doIt()">Eval</button>
 		<span id="resultValue"></span>
 	</div>

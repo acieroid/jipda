@@ -545,7 +545,7 @@ function pschemeCesk(cc)
     // TODO: store the value returned by the continuation somewhere in
     // the state, and use it later
     // this.state = state.storeKontValue(tid, value);
-    // this.state = state
+    this.state = state
     this.store = this.state.store;
     this.age = kcc++;
   }

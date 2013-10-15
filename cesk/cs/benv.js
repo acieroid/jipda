@@ -1,16 +1,13 @@
-function Benv(map, parentas)
+function Benv(map)
 {
   assertDefinedNotNull(map);
-  assertTrue(Array.isArray(parentas));
-  assertFalse(Arrays.contains(undefined, map.values(), Eq.equals));
   this._map = map;
-  this.parentas = parentas;
 }
 
 Benv.empty =
-  function (parenta)
+  function ()
   {
-    return new Benv(HashMap.empty(), parenta ? [parenta] : []);
+    return new Benv(HashMap.empty());
   }
 
 Benv.prototype.isBenv = true;
@@ -25,7 +22,6 @@ Benv.prototype.equals =
   function (x)
   {
     return (x instanceof Benv)
-      && Eq.equals(this.parentas, x.parentas)
       && this._map.equals(x._map)
   }
 
@@ -41,10 +37,6 @@ Benv.prototype.subsumes =
     if (this === x)
     {
       return true;
-    }
-    if (!this.parentas.subsumes(x.parentas))
-    {
-      return false;
     }
     return this._map.subsumes(x._map);
   }
@@ -71,10 +63,6 @@ Benv.prototype.diff = //DEBUG
   function (x)
   {
     var diff = [];
-    if (!this.parentas.setEquals(x.parentas))
-    {
-      diff.push("[[parentas]]\t" + this.parentas + " -- " + x.parentas);
-    }
     var thisNames = this._map.keys();
     var xNames = x._map.keys();
     for (var i = 0; i < thisNames.length; i++)
@@ -107,7 +95,7 @@ Benv.prototype.add =
     assertDefinedNotNull(name);
     assertDefinedNotNull(value);
     var map = this._map.put(name, value);
-    return new Benv(map, this.parentas);
+    return new Benv(map);
   }
 
 Benv.prototype.lookup =
@@ -120,8 +108,7 @@ Benv.prototype.join =
   function (x)
   {
     var map = this._map.join(x._map);
-    var parentas = Arrays.union(this.parentas, x.parentas, Eq.equals);
-    var result = new Benv(map, parentas);
+    var result = new Benv(map);
     return result;
   }
 
@@ -129,5 +116,5 @@ Benv.prototype.addresses =
   function ()
   {
     var frameAddresses = this._map.values().flatMap(function (value) {return value.addresses()});
-    return this.parentas.concat(frameAddresses);
+    return frameAddresses;
   }

@@ -364,14 +364,14 @@ function Lattice1()
       {
         return visitor.visitSome(this);
       }
-
-    var Top = Object.create(new LatticeValue());
+    
+    var Top = Object.create(new LatticeValue()); 
     Top.join = function (other) { return Top };
     Top.meet = function (other) { return other };
     Top.compareTo = function (other) { return other === Top ? 0 : 1 };
     Top.hashCode = function () { return 7 };
     Top.isAddress = function () { return false };
-    Top.addresses = function () { return false };
+//    Top.addresses = function () { return false }; considered to be primitive top, so addresses []
 //    Top.conc = function () { return false };
     Top.toString = function () { return "^" };
     Top.nice = function () { return "^" };
@@ -832,7 +832,9 @@ function Lattice1()
 
     module.NUMBER = Num;
     module.STRING = Top;
-
+    
+    module.toString = function () {return "Lattice1"}
+      
 		return module;
 	})();
 }

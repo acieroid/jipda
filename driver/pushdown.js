@@ -72,12 +72,6 @@ ErrorState.prototype.addresses =
   {
     return [];
   }
-ErrorState.prototype.setStore =
-  function (store)
-  {
-    return this;
-  }
-
 
 function Push(frame)
 {
@@ -149,9 +143,12 @@ Unch.prototype.toString =
     return "e";//"\u03B5";
   }
 
-function PushUnchKont(source)
+function PushUnchKont(source, stack, etg, ecg)
 {
   this.source = source;
+  this.stack = stack;
+  this.etg = etg;
+  this.ecg = ecg;
 }
 
 PushUnchKont.prototype.push =
@@ -172,10 +169,25 @@ PushUnchKont.prototype.unch =
     return [new Edge(this.source, new Unch(null), target, marks)];
   }
 
-function PopKont(source, frame)
+PushUnchKont.prototype.valueFor =
+  function ()
+  {
+    var source = this.source;
+    var etg = this.etg;
+    var ecg = this.ecg;
+    var popPredecessors = etg.incoming(source).flatMap(function (e) {return e.g.isPop ? [e.source] : []});
+    var epsPredecessors = popPredecessors.flatMap(function (q) {return ecg.predecessors(q)});
+    return epsPredecessors;
+  }
+
+
+function PopKont(source, frame, stack, etg, ecg)
 {
   this.source = source;
   this.frame = frame;
+  this.stack = stack;
+  this.etg = etg;
+  this.ecg = ecg;
 }
 
 PopKont.prototype.push =
@@ -198,71 +210,32 @@ PopKont.prototype.unch =
     return [];
   }
 
+PopKont.prototype.valueFor =
+  function ()
+  {
+    var source = this.source;
+    var etg = this.etg;
+    var ecg = this.ecg;
+    var popPredecessors = etg.incoming(source).flatMap(function (e) {return e.g.isPop ? [e.source] : []});
+    var epsPredecessors = popPredecessors.flatMap(function (q) {return ecg.predecessors(q)});
+    return epsPredecessors;
+  }
+
 var ceskDriver = {};
 
 ceskDriver.pushUnch =
-  function (q, stack)
+  function (q, stack, etg, ecg)
   {
-    var kont = new PushUnchKont(q);
+    var kont = new PushUnchKont(q, stack, etg, ecg);
     return q.next(kont);
   }
 
 ceskDriver.pop =
-  function (q, frame, stack)
+  function (q, frame, stack, etg, ecg)
   {
-    var kont = new PopKont(q, frame);
+    var kont = new PopKont(q, frame, stack, etg, ecg);
     return q.next(kont);
   }
-
-function GcDriver(driver)
-{
-  this.driver = driver;
-}
-
-GcDriver.gc =
-  function (q, stack)
-  {
-    var stackAddresses = stack.flatMap(function (frame) {return frame.addresses()}).toSet();
-//    print("gc", q.nice(), stack.toSet(), "\n  " + stackAddresses);
-    var store = q.store;
-    var rootSet = q.addresses().concat(stackAddresses);
-    var store2 = Agc.collect(store, rootSet);
-    var gcq = q.setStore(store2);
-    return gcq;
-  }
-
-GcDriver.prototype.pushUnch =
-  function (q, stack)
-  {
-  try
-  {
-    var gcq = q.type === "eval" ? GcDriver.gc(q, stack) : q;
-    var edges = this.driver.pushUnch(gcq, stack);
-    return edges.map(function (edge){return new Edge(q, edge.g, edge.target, edge.marks)});
-  }
-  catch (e)
-  {
-    e.q = q;
-    throw e;
-  }
-  }
-
-GcDriver.prototype.pop =
-  function (q, frame, stack)
-  {
-    try
-    {
-      var gcq = q.type === "eval" ? GcDriver.gc(q, stack) : q;
-      var edges = this.driver.pop(gcq, frame, stack);
-      return edges.map(function (edge){return new Edge(q, edge.g, edge.target, edge.marks)});
-    }
-    catch (e)
-    {
-      e.q = q;
-      throw e;
-    }
-  }
-
 
 function Pushdown()
 {
@@ -271,8 +244,7 @@ function Pushdown()
 Pushdown.run =
   function(q)
   {
-    //var k = ceskDriver;
-    var k = new GcDriver(ceskDriver);
+    var k = ceskDriver;
 
     var etg = Graph.empty();
     var ecg = Graph.empty();
@@ -293,7 +265,7 @@ Pushdown.run =
     function sprout(q)
     {
       var frames = ss.get(q, emptySet).values();
-      var pushUnchEdges = k.pushUnch(q, frames);
+      var pushUnchEdges = k.pushUnch(q, frames, etg, ecg); 
       dE = dE.concat(pushUnchEdges);
 //      dH = dH.concat(pushUnchEdges
 //                .filter(function (pushUnchEdge) {return pushUnchEdge.g.isUnch})
@@ -310,7 +282,7 @@ Pushdown.run =
         {
           propagateStack(q, q1);
           var frames = ss.get(q1).values();
-          var popEdges = k.pop(q1, frame, frames);
+          var popEdges = k.pop(q1, frame, frames, etg, ecg);
           return popEdges;
         }));
       dH = dH.concat(dE.map(function (popEdge) {return new Edge(s, new Unch(frame), popEdge.target)}));
@@ -364,7 +336,7 @@ Pushdown.run =
             {
               var frame = pushEdge.g.frame;
               var frames = ss.get(s4).values();
-              var popEdges = k.pop(s4, frame, frames);
+              var popEdges = k.pop(s4, frame, frames, etg, ecg);
               return popEdges;
             })
         });
@@ -376,7 +348,7 @@ Pushdown.run =
         }));
     }
 
-    try {
+//    try {
     while (true)
     {
       // epsilon edges
@@ -405,8 +377,8 @@ Pushdown.run =
           var q1 = e.target;
           if (!etg.containsTarget(q1))
           {
-            dS = dS.addLast(q1);
-          }
+            dS = dS.addFirst(q1);
+          }            
           etg = etg.addEdge(e);
           ecg = ecg.addEdge(new Edge(q, null, q)).addEdge(new Edge(q1, null, q1));
           if (g.isPush)
@@ -436,13 +408,13 @@ Pushdown.run =
         return {etg:etg, ecg:ecg, ss:ss};
       }
     }
-    }
-    catch (e)
-    {
-      print(e, e.stack);
-      etg = etg.addEdge(new Edge(e.q, new Unch(null), new ErrorState(e.q.store, String(e), e.stack)));
-      return {etg:etg, ecg:ecg, ss:ss};
-    }
+//    }
+//    catch (e)
+//    {
+//      print(e, e.stack);
+//      etg = etg.addEdge(new Edge(e.q, new Unch(null), new ErrorState(e.q.store, String(e), e.stack)));
+//      return {etg:etg, ecg:ecg, ss:ss};
+//    } 
   }
 
 Pushdown.preStackUntil =
