@@ -573,7 +573,9 @@ function assertDefinedNotNull(actual, msg)
 {
   if (actual === undefined || actual === null)
   {
-    throw new Error(msg || "assertDefinedNotNull: got " + actual);
+    var e = new Error(msg || "assertDefinedNotNull: got " + actual);
+    print(e.stack);
+    throw e;
   }
 }
 

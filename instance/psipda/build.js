@@ -9,16 +9,16 @@ function b()
   load("../../lattice/setLattice.js");
   load("../../lattice/cpLattice.js");
   load("../../address/address.js");
-  load("../../address/tagAg.js");
-  load("../../address/concreteAg.js");
-  load("../../thread/tagTg.js");
-  load("../../thread/unboundedHistory.js");
   load("../../driver/graph.js");
   load("../../driver/pushdown.js");
   load("../../cesk/cesk.js");
-  load("../../cesk/pschemeCesk.js");
+  load("../../cesk/ps/pschemeCesk.js");
+  load("../../cesk/ps/benv.js");
+  load("../../cesk/ps/tagTg.js");
+  load("../../cesk/ps/unboundedHistory.js");
+  load("../../cesk/ps/tagAg.js");
+  load("../../cesk/ps/concreteAg.js");
   load("../../ast/scheme.js");
-  load("benv.js");
   load("psipda.js");
 
 //  load("test/astTests.js");
