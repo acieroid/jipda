@@ -1279,12 +1279,16 @@ function pschemeCesk(cc)
   function evalSpawn(node, tid, state, kont)
   {
     var benva = state.getBenva(tid);
+    var store = state.store;
     var exp = node.cdr;
     var thread = createThread(exp, benva);
-    state = state.addThread(thread);
+    // Set the value at the address corresponding to the new thread
+    // id, in the store
+    store = store.allocAval(thread.tid, l.abst1(thread));
+    state = state.addThread(thread).setStore(store);
+    var value = l.abst1(thread.tid);
     return kont.pop(function (frame) {
-      // TODO: return the thread ID as a first-class value
-      return new KontState(frame, L_UNDEFINED, tid, state)
+      return new KontState(frame, value, tid, state)
     });
   }
 
