@@ -1,10 +1,7 @@
 var tagTg = {}
 
-// Initial thread ID
-tagTg.t0 = 0;
-
 tagTg.thread =
-  function (node, time)
+  function (node)
   {
     // Thread IDs are just addresses
     return new ContextAddr(node.tag, null);

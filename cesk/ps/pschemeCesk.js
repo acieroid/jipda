@@ -112,7 +112,12 @@ function pschemeCesk(cc)
       var thread = this.threads.get(tid, null);
       // assert(thread !== null);
       thread = thread.setNode(node);
-      return new MachineState(threads.put(tid, thread), this.store);
+      return new MachineState(this.threads.put(tid, thread), this.store);
+    }
+  MachineState.prototype.addThread =
+    function (thread)
+    {
+      return new MachineState(this.threads.put(thread.tid, thread), this.store);
     }
 
   // Context = Exp × Env × Addr × Hist
@@ -174,7 +179,7 @@ function pschemeCesk(cc)
     function (x)
     {
       return (x instanceof Thread)
-        && this.tid === x.tid
+        && Eq.equals(this.tid, x.tid)
         && Eq.equals(this.context, x.context);
     }
   Thread.prototype.hashCode =
@@ -182,7 +187,7 @@ function pschemeCesk(cc)
     {
       var prime = 7;
       var result = 1;
-      result = prime * result + this.tid;
+      result = prime * result + this.tid.hashCode();
       result = prime * result + this.context.hashCode();
     }
   Thread.prototype.addresses =
@@ -200,6 +205,12 @@ function pschemeCesk(cc)
     {
       return new Thread(this.tid, this.context.setBenva(benva));
     }
+  function createThread(node, benva)
+  {
+    var tid = t.thread(node);
+    var haltFrame = new HaltKont([benva]);
+    return new Thread(tid, new Context(node, benva, haltFrame, h.h0));
+  }
 
   function Closure(node, statica, params, body)
   {
@@ -548,8 +559,8 @@ function pschemeCesk(cc)
     {
       return (x instanceof EvalState)
         && this.node === x.node
-        && this.tid === x.tid
-        && Eq.equals(this.state, x.state)
+        && Eq.equals(this.tid, x.tid)
+        && Eq.equals(this.state, x.state);
     }
   EvalState.prototype.hashCode =
     function ()
@@ -557,7 +568,7 @@ function pschemeCesk(cc)
       var prime = 7;
       var result = 1;
       result = prime * result + this.node.hashCode();
-      result = prime * result + this.tid;
+      result = prime * result + this.tid.hashCode();
       result = prime * result + this.state.hashCode();
       return result;
     }
@@ -586,10 +597,10 @@ function pschemeCesk(cc)
     function (x)
     {
       return (x instanceof KontState)
-        && this.tid === x.tid
+        && Eq.equals(this.tid, x.tid)
         && Eq.equals(this.frame, x.frame)
         && Eq.equals(this.value, x.value)
-        && Eq.equals(this.state, x.state)
+        && Eq.equals(this.state, x.state);
     }
   KontState.prototype.hashCode =
     function ()
@@ -635,8 +646,8 @@ function pschemeCesk(cc)
     {
       return x instanceof DefineKont
         && this.node === x.node
-        && this.tid === x.tid
-        && Eq.equals(this.benva, x.benva);
+        && Eq.equals(this.benva, x.benva)
+        && Eq.equals(this.tid, x.tid);
     }
   DefineKont.prototype.hashCode =
     function ()
@@ -645,7 +656,7 @@ function pschemeCesk(cc)
       var result = 1;
       result = prime * result + this.node.hashCode();
       result = prime * result + this.benva.hashCode();
-      result = prime * result + this.tid;
+      result = prime * result + this.tid.hashCode();
       return result;
     }
   DefineKont.prototype.toString =
@@ -690,8 +701,8 @@ function pschemeCesk(cc)
     {
       return x instanceof OperatorKont
         && this.node === x.node
-        && this.tid === x.tid
-        && Eq.equals(this.benva, x.benva);
+        && Eq.equals(this.benva, x.benva)
+        && Eq.equals(this.tid, x.tid);
     }
   OperatorKont.prototype.hashCode =
     function ()
@@ -700,7 +711,7 @@ function pschemeCesk(cc)
       var result = 1;
       result = prime * result + this.node.hashCode();
       result = prime * result + this.benva.hashCode();
-      result = prime * result + this.tid;
+      result = prime * result + this.tid.hashCode();
       return result;
     }
   OperatorKont.prototype.toString =
@@ -749,10 +760,10 @@ function pschemeCesk(cc)
       return x instanceof OperandsKont
         && this.node === x.node
         && this.operands === x.operands
-        && this.tid === x.tid
         && Eq.equals(this.operatorValue, x.operatorValue)
         && Eq.equals(this.operandValues, x.operandValues)
         && Eq.equals(this.benva, x.benva)
+        && Eq.equals(this.tid, x.tid);
     }
   OperandsKont.prototype.hashCode =
     function ()
@@ -764,7 +775,7 @@ function pschemeCesk(cc)
       result = prime * result + this.operatorValue.hashCode();
       result = prime * result + this.operandValues.hashCode();
       result = prime * result + this.benva.hashCode();
-      result = prime * result + this.tid;
+      result = prime * result + this.tid.hashCode();
       return result;
     }
   OperandsKont.prototype.toString =
@@ -816,8 +827,8 @@ function pschemeCesk(cc)
       return (x instanceof BeginKont)
         && this.node === x.node
         && this.exps === x.exps
-        && this.tid === x.tid
-        && Eq.equals(this.benva, x.benva);
+        && Eq.equals(this.benva, x.benva)
+        && Eq.equals(this.tid, x.tid);
     }
   BeginKont.prototype.hashCode =
     function ()
@@ -827,7 +838,7 @@ function pschemeCesk(cc)
       result = prime * result + this.node.hashCode();
       result = prime * result + this.exps.hashCode();
       result = prime * result + this.benva.hashCode();
-      result = prime * result + this.tid;
+      result = prime * result + this.tid.hashCode();
       return result;
     }
   BeginKont.prototype.toString =
@@ -872,8 +883,8 @@ function pschemeCesk(cc)
     {
       return x instanceof IfKont
         && this.node === x.node
-        && this.tid === x.tid
-        && Eq.equals(this.benva, x.benva);
+        && Eq.equals(this.benva, x.benva)
+        && Eq.equals(this.tid, x.tid);
     }
   IfKont.prototype.hashCode =
     function ()
@@ -882,7 +893,7 @@ function pschemeCesk(cc)
       var result = 1;
       result = prime * result + this.node.hashCode();
       result = prime * result + this.benva.hashCode();
-      result = prime * result + this.tid;
+      result = prime * result + this.tid.hashCode();
       return result;
     }
   IfKont.prototype.toString =
@@ -1047,7 +1058,7 @@ function pschemeCesk(cc)
 
   function evalDefine(node, tid, state, kont)
   {
-    var benva = state.benva;
+    var benva = state.getBenva(tid);
     var lval = node.cdr.car;
     if (lval instanceof Pair)
     {
@@ -1265,6 +1276,18 @@ function pschemeCesk(cc)
     return kont.push(frame, new EvalState(operator, tid, state));
   }
 
+  function evalSpawn(node, tid, state, kont)
+  {
+    var benva = state.getBenva(tid);
+    var exp = node.cdr;
+    var thread = createThread(exp, benva);
+    state = state.addThread(thread);
+    return kont.pop(function (frame) {
+      // TODO: return the thread ID as a first-class value
+      return new KontState(frame, L_UNDEFINED, tid, state)
+    });
+  }
+
   function evalNode(node, tid, state, kont)
   {
     if (node instanceof Number || node instanceof Boolean || node instanceof String || node instanceof Null)
@@ -1305,6 +1328,10 @@ function pschemeCesk(cc)
         {
           throw new Error("set! not yet implemented");
         }
+        if (name === "spawn")
+        {
+          return evalSpawn(node, tid, state, kont);
+        }
       }
       return evalApplication(node, tid, state, kont);
     }
@@ -1322,8 +1349,7 @@ function pschemeCesk(cc)
     {
       override = override || {};
       var benva = override.benva || globala;
-      var haltFrame = new HaltKont([benva]);
-      var initThread = new Thread(t.t0, new Context(node, benva, haltFrame, h.h0));
+      var initThread = createThread(node, benva);
       return new InitState(initThread, override.store || store);
     }
 
