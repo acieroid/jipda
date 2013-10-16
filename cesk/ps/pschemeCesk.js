@@ -4,22 +4,30 @@ function pschemeCesk(cc)
   var a = cc.a;
   // TID generator
   var t = cc.t;
-  // Thread history builder
+  // thread history builder
   var h = cc.h;
   // benv creator
-  // var b = cc.b || new DefaultBenv();
+//  var b = cc.b || new DefaultBenv();
   // primitive lattice
   var p = cc.p;
 
-  var memo = cc.memo || false;
+  var gcFlag = cc.gc === undefined ? true : cc.gc;
+  var memoFlag = cc.memo === undefined ? false : cc.memo;
+  var memoTable = [];
 
   assertDefinedNotNull(a);
   assertDefinedNotNull(t);
-  // assertDefinedNotNull(b);
+  assertDefinedNotNull(h);
+//  assertDefinedNotNull(b);
   assertDefinedNotNull(p);
 
   // lattice (primitives + addresses)
   var l = new JipdaLattice(p); // TODO this will become param
+
+  print("allocator", a);
+  print("lattice", p);
+  print("gc", gcFlag);
+  print("memoization", memoFlag);
 
   // install constants
   var L_UNDEFINED = l.abst1(undefined);
@@ -89,7 +97,7 @@ function pschemeCesk(cc)
       var thread = this.threads.get(tid, null);
       // assert(thread != null);
       thread = thread.setBenva(benva);
-      return new MachineState(threads.put(tid, thread), this.store);
+      return new MachineState(this.threads.put(tid, thread), this.store);
     }
   MachineState.prototype.getNode =
     function (tid)
@@ -200,6 +208,7 @@ function pschemeCesk(cc)
     this.params = params;
     this.body = body;
   }
+
   Closure.prototype.toString =
     function ()
     {
@@ -210,6 +219,7 @@ function pschemeCesk(cc)
     {
       return "<Closure " + this.node.tag + ">"
     }
+
   Closure.prototype.equals =
     function (other)
     {
@@ -224,6 +234,7 @@ function pschemeCesk(cc)
       return this.node === other.node
         && this.statica.equals(other.statica);
     }
+
   Closure.prototype.hashCode =
     function (x)
     {
@@ -233,15 +244,23 @@ function pschemeCesk(cc)
       result = prime * result + this.statica.hashCode();
       return result;
     }
+
+//  Closure.prototype.compareTo =
+//    function (x)
+//    {
+//      return this.equals(x) ? 0 : undefined;
+//    }
+
   Closure.prototype.apply_ =
     function (application, operandValues, tid, state, kont)
     {
+//      print("apply", application, operandValues);
       var store = state.store;
       var benva = state.getBenva(tid);
       var fun = this.node;
       var statica = this.statica;
-      var extendedBenva = a.benv(application, benva, store, kont);
-      var extendedBenv = Benv.empty(statica);
+      var extendedBenva = a.benv(fun, application);
+      var extendedBenv = store.lookupAval(statica);
       var params = this.params;
       var i = 0;
       while (!(params instanceof Null))
@@ -257,9 +276,10 @@ function pschemeCesk(cc)
       {
         return kont.unch(new EvalState(this.body.car, tid, state));
       }
-      var frame = new BeginKont(application, this.body, tid, state);
+      var frame = new BeginKont(application, this.body, extendedBenva, tid); // TODO 'application' or 'fun'?
       return kont.push(frame, new EvalState(this.body.car, tid, state));
     }
+
   Closure.prototype.addresses =
     function ()
     {
@@ -271,16 +291,19 @@ function pschemeCesk(cc)
     this.name = name;
     this.apply_ = apply_;
   }
+
   Primitive.prototype.hashCode =
     function ()
     {
       return this.name.hashCode();
     }
+
   Primitive.prototype.addresses =
     function ()
     {
       return [];
     }
+
   Primitive.prototype.toString =
     function ()
     {
@@ -291,16 +314,19 @@ function pschemeCesk(cc)
   {
     this.procs = procs;
   }
+
   Procedure.empty =
     function ()
     {
       return new Procedure([]);
     }
+
   Procedure.from =
     function (procs)
     {
       return new Procedure(procs.slice(0));
     }
+
   Procedure.prototype.equals =
     function (x)
     {
@@ -310,11 +336,13 @@ function pschemeCesk(cc)
       }
       return this.procs.setEquals(x.procs);
     }
+
   Procedure.prototype.hashCode =
     function ()
     {
       return this.procs.hashCode();
     }
+
   Procedure.prototype.subsumes =
     function (x)
     {
@@ -324,11 +352,13 @@ function pschemeCesk(cc)
       }
       return this.procs.subsumes(x.procs);
     }
+
   Procedure.prototype.compareTo =
     function (x)
     {
       return Lattice.subsumeComparison(this, x);
     }
+
   Procedure.prototype.join =
     function (x)
     {
@@ -338,11 +368,13 @@ function pschemeCesk(cc)
       }
       return new Procedure(Arrays.deleteDuplicates(this.procs.concat(x.procs), Eq.equals));
     }
+
   Procedure.prototype.addresses =
     function ()
     {
       return this.procs.flatMap(function (proc) {return proc.addresses()});
     }
+
   Procedure.prototype.apply_ =
     function (application, operandValues, tid, state, kont)
     {
@@ -350,6 +382,7 @@ function pschemeCesk(cc)
           return proc.apply_(application, operandValues, tid, state, kont)
       });
     }
+
   Procedure.prototype.toString =
     function ()
     {
@@ -427,6 +460,7 @@ function pschemeCesk(cc)
         });
       });
 
+
   var globala = new ContextAddr("global", 0);
   store = store.allocAval(globala, global);
 
@@ -451,9 +485,9 @@ function pschemeCesk(cc)
   InitState.prototype.equals =
     function (x)
     {
-      return this.type === x.type &&
-        Eq.equals(this.state, x.state);
-   }
+      return this.type === x.type
+        && Eq.equals(this.state, x.state);
+    }
   InitState.prototype.hashCode =
     function ()
     {
@@ -461,7 +495,7 @@ function pschemeCesk(cc)
       var result = 1;
       result = prime * result + this.state.hashCode();
       return result;
-   }
+    }
   InitState.prototype.next =
     function (kont)
     {
@@ -474,85 +508,85 @@ function pschemeCesk(cc)
     {
       return this.thread.addresses();
     }
-  InitState.prototype.setStore =
-    function (store)
+
+  function gc(q, kont)
+  {
+    if (gcFlag)
     {
-      return new InitState(this.thread, store);
+      var stackAddresses = kont.stack.flatMap(function (frame) {return frame.addresses()}).toSet();
+      var rootSet = q.addresses().concat(stackAddresses);
+      return Agc.collect(q.store, rootSet);
     }
+    else
+    {
+      return q.store;
+    }
+  }
 
   function EvalState(node, tid, state)
   {
     this.type = "eval";
     this.node = node;
+    this.store = state.store;
     this.tid = tid;
     this.state = state;
-    this.store = state.store;
-    var thread = state.threads.get(tid, null);
-    assertDefinedNotNull(thread);
-    this.thread = thread;
+    this.thread = state.threads.get(tid, null);
+    assertDefinedNotNull(this.thread);
   }
   EvalState.prototype.toString =
     function ()
     {
-      return "#eval " + this.tid + " " + this.thread.context.node.tag;
+      return "#eval " + this.tid + " " + this.node.tag;
     }
   EvalState.prototype.nice =
     function ()
     {
-      return "#eval " + this.tid + " " + this.thread.context.node.tag;
+      return "#eval " + this.tid + " " + this.node.tag;
     }
   EvalState.prototype.equals =
     function (x)
     {
       return (x instanceof EvalState)
+        && this.node === x.node
         && this.tid === x.tid
-        && Eq.equals(this.state, x.state);
+        && Eq.equals(this.state, x.state)
     }
   EvalState.prototype.hashCode =
     function ()
     {
       var prime = 7;
       var result = 1;
-      result = prime * result + this.tid
+      result = prime * result + this.node.hashCode();
+      result = prime * result + this.tid;
       result = prime * result + this.state.hashCode();
       return result;
     }
   EvalState.prototype.next =
     function (kont)
     {
-      return evalNode(this.node, this.tid, this.state, kont);
+      var state = this.state.setStore(gc(this, kont));
+      return evalNode(this.node, this.tid, state, kont);
     }
   EvalState.prototype.addresses =
     function ()
     {
       return this.thread.addresses();
     }
-  EvalState.prototype.setStore =
-    function (store)
-    {
-      var state = this.state.setStore(store);
-      return new EvalState(this.node, this.tid, state);
-    }
 
-  var kcc = 0;
-  function KontState(tid, frame, value, state)
+  function KontState(frame, value, tid, state)
   {
     this.type = "kont";
     this.frame = frame;
-    this.value = value;
-    // assert(state instanceof MachineState);
-
-    // TODO: store the value returned by the continuation somewhere in
-    // the state, and use it later
-    // this.state = state.storeKontValue(tid, value);
-    this.state = state
-    this.store = this.state.store;
-    this.age = kcc++;
+    this.value = value; // TODO: store it somewhere in the state
+    this.store = state.store;
+    this.tid = tid;
+    this.state = state;
   }
   KontState.prototype.equals =
     function (x)
     {
       return (x instanceof KontState)
+        && this.tid === x.tid
         && Eq.equals(this.frame, x.frame)
         && Eq.equals(this.value, x.value)
         && Eq.equals(this.state, x.state)
@@ -580,34 +614,29 @@ function pschemeCesk(cc)
   KontState.prototype.next =
     function (kont)
     {
-      // We can either continue executing this thread, or execute
-      // another thread
-      return applyKont(this.frame, this.value, this.store, kont)
+      // TODO: switch to other threads
+      var state = this.state.setStore(gc(this, kont));
+      return applyKont(this.frame, this.value, this.tid, state, kont)
     }
   KontState.prototype.addresses =
     function ()
     {
       return this.frame.addresses().concat(this.value.addresses());
     }
-  KontState.prototype.setStore =
-    function (store)
-    {
-      return new KontState(this.frame, this.value, store);
-    }
 
-  function DefineKont(node, tid, state)
+  function DefineKont(node, benva, tid)
   {
     this.node = node;
+    this.benva = benva;
     this.tid = tid;
-    this.state = state;
   }
   DefineKont.prototype.equals =
     function (x)
     {
       return x instanceof DefineKont
         && this.node === x.node
-        && thit.tid === x.tid
-        && Eq.equals(this.state, x.state);
+        && this.tid === x.tid
+        && Eq.equals(this.benva, x.benva);
     }
   DefineKont.prototype.hashCode =
     function ()
@@ -615,8 +644,8 @@ function pschemeCesk(cc)
       var prime = 7;
       var result = 1;
       result = prime * result + this.node.hashCode();
+      result = prime * result + this.benva.hashCode();
       result = prime * result + this.tid;
-      result = prime * result + this.state.hashCode();
       return result;
     }
   DefineKont.prototype.toString =
@@ -627,40 +656,41 @@ function pschemeCesk(cc)
   DefineKont.prototype.nice =
     function ()
     {
-      return this.toString()
+      return "def-" + this.tid + "-" + this.node.tag;
     }
   DefineKont.prototype.addresses =
     function ()
     {
-      var benva = this.state.getBenva(this.tid);
-      return [benva];
+      return [this.benva];
     }
   DefineKont.prototype.apply =
-    function (value, store, kont)
+    function (value, tid, state, kont)
     {
       var node = this.node;
-      var benva = this.state.getBenva(this.tid);
-      var store = this.state.store;
+      var benva = this.benva;
+      var store = state.store;
       var id = node.cdr.car.name;
       var benv = store.lookupAval(benva);
       benv = benv.add(id, value);
-      store = store.updateAval(benva, benv); // side-effect
-      state = state.setStore(store);
+      state.setBenva(tid, benva); // TODO: necessary?
+      state = state.setStore(store.updateAval(benva, benv)); // side-effect
       return kont.pop(function (frame) {
-          return new KontState(frame, value, id, state)
+          return new KontState(frame, value, tid, state)
       });
     }
 
-  function OperatorKont(node, benva)
+  function OperatorKont(node, benva, tid)
   {
     this.node = node;
     this.benva = benva;
+    this.tid = tid;
   }
   OperatorKont.prototype.equals =
     function (x)
     {
       return x instanceof OperatorKont
         && this.node === x.node
+        && this.tid === x.tid
         && Eq.equals(this.benva, x.benva);
     }
   OperatorKont.prototype.hashCode =
@@ -670,17 +700,18 @@ function pschemeCesk(cc)
       var result = 1;
       result = prime * result + this.node.hashCode();
       result = prime * result + this.benva.hashCode();
+      result = prime * result + this.tid;
       return result;
     }
   OperatorKont.prototype.toString =
     function ()
     {
-      return "rator-" + this.node.tag;
+      return "rator-" + this.tid + "-" + this.node.tag;
     }
   OperatorKont.prototype.nice =
     function ()
     {
-      return "rator-" + this.node.tag;
+      return "rator-" + this.tid + "-" + this.node.tag;
     }
   OperatorKont.prototype.addresses =
     function ()
@@ -693,23 +724,24 @@ function pschemeCesk(cc)
       var node = this.node;
       var benva = this.benva;
       var operands = node.cdr;
-      state = state.setBenva(tid, benva);
+      state = state.setBenva(tid, benva); // TODO: necessary?
 
       if (operands instanceof Null)
       {
         return applyProc(node, operatorValue, [], tid, state, kont);
       }
-      var frame = new OperandsKont(node, operands, operatorValue, [], benva);
+      var frame = new OperandsKont(node, operands, operatorValue, [], benva, tid);
       return kont.push(frame, new EvalState(operands.car, tid, state));
     }
 
-  function OperandsKont(node, operands, operatorValue, operandValues, benva)
+  function OperandsKont(node, operands, operatorValue, operandValues, benva, tid)
   {
     this.node = node;
     this.operands = operands;
     this.operatorValue = operatorValue;
     this.operandValues = operandValues;
     this.benva = benva;
+    this.tid = tid;
   }
   OperandsKont.prototype.equals =
     function (x)
@@ -717,6 +749,7 @@ function pschemeCesk(cc)
       return x instanceof OperandsKont
         && this.node === x.node
         && this.operands === x.operands
+        && this.tid === x.tid
         && Eq.equals(this.operatorValue, x.operatorValue)
         && Eq.equals(this.operandValues, x.operandValues)
         && Eq.equals(this.benva, x.benva)
@@ -731,17 +764,18 @@ function pschemeCesk(cc)
       result = prime * result + this.operatorValue.hashCode();
       result = prime * result + this.operandValues.hashCode();
       result = prime * result + this.benva.hashCode();
+      result = prime * result + this.tid;
       return result;
     }
   OperandsKont.prototype.toString =
     function ()
     {
-      return "rand-" + this.node.tag + "-" + this.operands.tag;
+      return "rand-" + this.tid + "-" + this.node.tag + "-" + this.operands.tag;
     }
   OperandsKont.prototype.nice =
     function ()
     {
-      return "rand-" + this.node.tag + "-" + this.operands.tag;
+      return "rand-" + this.tid + "-" + this.node.tag + "-" + this.operands.tag;
     }
   OperandsKont.prototype.addresses =
     function ()
@@ -755,24 +789,26 @@ function pschemeCesk(cc)
     {
       var node = this.node;
       var benva = this.benva;
+      var store = state.store;
       var operatorValue = this.operatorValue;
       var operandValues = this.operandValues.addLast(operandValue);
       var operands = this.operands.cdr;
-      state = state.setBenva(tid, benva);
+      state = state.setBenva(tid, benva); // TODO: necessary?
 
       if (operands instanceof Null)
       {
         return applyProc(node, operatorValue, operandValues, tid, state, kont);
       }
-      var frame = new OperandsKont(node, operands, operatorValue, operandValues, benva);
+      var frame = new OperandsKont(node, operands, operatorValue, operandValues, benva, tid);
       return kont.push(frame, new EvalState(operands.car, tid, state));
     }
 
-  function BeginKont(node, exps, benva)
+  function BeginKont(node, exps, benva, tid)
   {
     this.node = node;
     this.exps = exps;
     this.benva = benva;
+    this.tid = tid;
   }
   BeginKont.prototype.equals =
     function (x)
@@ -780,6 +816,7 @@ function pschemeCesk(cc)
       return (x instanceof BeginKont)
         && this.node === x.node
         && this.exps === x.exps
+        && this.tid === x.tid
         && Eq.equals(this.benva, x.benva);
     }
   BeginKont.prototype.hashCode =
@@ -790,17 +827,18 @@ function pschemeCesk(cc)
       result = prime * result + this.node.hashCode();
       result = prime * result + this.exps.hashCode();
       result = prime * result + this.benva.hashCode();
+      result = prime * result + this.tid;
       return result;
     }
   BeginKont.prototype.toString =
     function ()
     {
-      return "begin-" + this.node.tag + "-" + this.exps.tag;
+      return "begin-" + this.tid + "-" + this.node.tag + "-" + this.exps.tag;
     }
   BeginKont.prototype.nice =
     function ()
     {
-      return "begin-" + this.node.tag + "-" + this.exps.tag;
+      return "begin-" + this.tid + "-" + this.node.tag + "-" + this.exps.tag;
     }
   BeginKont.prototype.addresses =
     function ()
@@ -813,26 +851,28 @@ function pschemeCesk(cc)
       var node = this.node;
       var benva = this.benva;
       var exps = this.exps.cdr;
-      state = state.setBenva(tid, benva);
+      state = state.setBenva(tid, benva); // TODO: necessary?
 
       if (exps.cdr instanceof Null)
       {
         return kont.unch(new EvalState(exps.car, tid, state));
       }
-      var frame = new BeginKont(node, exps, benva);
+      var frame = new BeginKont(node, exps, benva, tid);
       return kont.push(frame, new EvalState(exps.car, tid, state));
     }
 
-  function IfKont(node, benva)
+  function IfKont(node, benva, tid)
   {
     this.node = node;
     this.benva = benva;
+    this.tid = tid;
   }
   IfKont.prototype.equals =
     function (x)
     {
       return x instanceof IfKont
         && this.node === x.node
+        && this.tid === x.tid
         && Eq.equals(this.benva, x.benva);
     }
   IfKont.prototype.hashCode =
@@ -842,17 +882,18 @@ function pschemeCesk(cc)
       var result = 1;
       result = prime * result + this.node.hashCode();
       result = prime * result + this.benva.hashCode();
+      result = prime * result + this.tid;
       return result;
     }
   IfKont.prototype.toString =
     function ()
     {
-      return "if-" + this.node.tag;
+      return "if-" + this.tid + "-"+ this.node.tag;
     }
   IfKont.prototype.nice =
     function ()
     {
-      return "if-" + this.node.tag;
+      return "if-" + this.tid + "-" + this.node.tag;
     }
   IfKont.prototype.addresses =
     function ()
@@ -864,13 +905,13 @@ function pschemeCesk(cc)
     {
       var node = this.node;
       var benva = this.benva;
-      state = state.setBenva(tid, benva);
+      state = state.setBenva(tid, benva); // TODO: necessary?
       var consequent = node.cdr.cdr.car;
       var alternate = node.cdr.cdr.cdr.car;
       var falseProj = conditionValue.meet(L_FALSE);
       if (falseProj === BOT) // no false in value
       {
-        return evalNode(consequent, benva, store, kont);
+        return kont.unch(new EvalState(consequent, tid, state));
       }
       else if (conditionValue.equals(falseProj)) // value is false
       {
@@ -878,7 +919,7 @@ function pschemeCesk(cc)
 //        {
 //          return kont.pop(function (frame) {return new KontState(frame, L_UNDEFINED, store)});
 //        }
-        return evalNode(alternate, tid, state, kont);
+        return kont.unch(new EvalState(alternate, tid, state));
       }
       else // value > false
       {
@@ -896,91 +937,89 @@ function pschemeCesk(cc)
       }
     }
 
-  function SetKont(node, benva)
-  {
-    this.node = node;
-    this.benva = benva;
-  }
-  SetKont.prototype.equals =
-    function (x)
-    {
-      return x instanceof SetKont
-        && this.node === x.node
-        && Eq.equals(this.benva, x.benva);
-    }
-  SetKont.prototype.hashCode =
-    function ()
-    {
-      var prime = 7;
-      var result = 1;
-      result = prime * result + this.node.hashCode();
-      result = prime * result + this.benva.hashCode();
-      return result;
-    }
-  SetKont.prototype.toString =
-    function ()
-    {
-      return "set-" + this.node.tag;
-    }
-  SetKont.prototype.addresses =
-    function ()
-    {
-      return [this.benva];
-    }
-  SetKont.prototype.apply =
-    function (value, tid, state, kont)
-    {
-      var node = this.node;
-      var benva = this.benva;
-      var store = state.store;
-      state = state.setBenva(tid, benva);
-      var id = node.cdr.car;
-      var name = id.name;
+  // TODO
+  // function SetKont(node, benva)
+  // {
+  //   this.node = node;
+  //   this.benva = benva;
+  // }
+  // SetKont.prototype.equals =
+  //   function (x)
+  //   {
+  //     return x instanceof SetKont
+  //       && this.node === x.node
+  //       && Eq.equals(this.benva, x.benva);
+  //   }
+  // SetKont.prototype.hashCode =
+  //   function ()
+  //   {
+  //     var prime = 7;
+  //     var result = 1;
+  //     result = prime * result + this.node.hashCode();
+  //     result = prime * result + this.benva.hashCode();
+  //     return result;
+  //   }
+  // SetKont.prototype.toString =
+  //   function ()
+  //   {
+  //     return "set-" + this.node.tag;
+  //   }
+  // SetKont.prototype.addresses =
+  //   function ()
+  //   {
+  //     return [this.benva];
+  //   }
+  // SetKont.prototype.apply =
+  //   function (value, store, kont)
+  //   {
+  //     var node = this.node;
+  //     var benva = this.benva;
+  //     var id = node.cdr.car;
+  //     var name = id.name;
 
-      var as = [];
-      var todo = [benva];
-      var visited = HashSet.empty();
-      /* find the benvs where id is bound */
-      while (todo.length > 0)
-      {
-        var a = todo.shift();
-        if (visited.contains(a))
-        {
-          continue;
-        }
-        visited = visited.add(a);
-        var benv = store.lookupAval(a);
-        var lookupValue = benv.lookup(name);
-        if (lookupValue !== BOT)
-        {
-          as.push(a);
-        }
-        var parentas = benv.parentas;
-        todo = todo.concat(parentas);
-      }
-      if (as.length === 0)
-      {
-        throw new Error("cannot set! an undefined identifier");
-      }
-      /* update the values */
-      while (as.length > 0)
-      {
-        var a = as.shift();
-        var benv = store.lookupAval(a);
-        benv = benv.add(name, value);
-        store = store.updateAval(a, benv);
-      }
-      state = state.setStore(store);
-      return kont.pop(function (frame) {
-        return new KontState(frame, L_UNDEFINED, tid, state)
-      });
-    }
+  //     var as = [];
+  //     var todo = [benva];
+  //     var visited = HashSet.empty();
+  //     /* find the benvs where id is bound */
+  //     while (todo.length > 0)
+  //     {
+  //       var a = todo.shift();
+  //       if (visited.contains(a))
+  //       {
+  //         continue;
+  //       }
+  //       visited = visited.add(a);
+  //       var benv = store.lookupAval(a);
+  //       var lookupValue = benv.lookup(name);
+  //       if (lookupValue !== BOT)
+  //       {
+  //         as.push(a);
+  //       }
+  //       var parentas = benv.parentas;
+  //       todo = todo.concat(parentas);
+  //     }
+  //     if (as.length === 0)
+  //     {
+  //       throw new Error("cannot set! an undefined identifier");
+  //     }
+  //     /* update the values */
+  //     while (as.length > 0)
+  //     {
+  //       var a = as.shift();
+  //       var benv = store.lookupAval(a);
+  //       benv = benv.add(name, value);
+  //       store = store.updateAval(a, benv);
+  //     }
+  //     return kont.pop(function (frame) {
+  //       return new KontState(frame, L_UNDEFINED, store)
+  //     });
+  //   }
 
   function evalLiteral(node, tid, state, kont)
   {
     var value = l.abst1(node.valueOf());
     return kont.pop(function (frame) {
-        return new KontState(tid, frame, value, state)
+        return new KontState(frame, value, tid, state)
     });
   }
 
@@ -988,12 +1027,13 @@ function pschemeCesk(cc)
   {
     var benva = state.getBenva(tid);
     var store = state.store;
+
     var closure = new Closure(node, benva, node.cdr.car, node.cdr.cdr);
-    var closurea = a.closure(node, benva, store, kont);
+    var closurea = a.closure(node, benva); // benva here is transitive application
     var closureRef = l.abst1(closurea);
-    store = store.allocAval(closurea, Procedure.from([closure]));
+    state = state.setStore(store.allocAval(closurea, Procedure.from([closure])));
     return kont.pop(function (frame) {
-        return new KontState(tid, frame, closureRef, state)
+        return new KontState(frame, closureRef, tid, state)
     });
   }
 
@@ -1001,91 +1041,201 @@ function pschemeCesk(cc)
   {
     var value = l.abst1(node.cdr.car);
     return kont.pop(function (frame) {
-        return new KontState(tid, frame, value, state)
+        return new KontState(frame, value, tid, state)
     });
   }
 
   function evalDefine(node, tid, state, kont)
   {
-    var benva = state.getBenva(tid);
+    var benva = state.benva;
     var lval = node.cdr.car;
     if (lval instanceof Pair)
     {
       throw new Error("TODO");
     }
     var exp = node.cdr.cdr.car;
-    var frame = new DefineKont(node, tid, state);
-    return kont.push(frame, new EvalState(node, tid, state));
+    var frame = new DefineKont(node, benva, tid);
+    return kont.push(frame, new EvalState(exp, tid, state));
   }
 
   function evalIdentifier(node, tid, state, kont)
   {
+    var name = node.name;
     var benva = state.getBenva(tid);
     var store = state.store;
-    var name = node.name;
-    var todo = [benva];
-    var visited = HashSet.empty();
-    var value = BOT;
-    while (todo.length > 0)
-    {
-      var a = todo.shift();
-      if (visited.contains(a))
-      {
-        continue;
-      }
-      visited = visited.add(a);
-      var benv = store.lookupAval(a);
-      var lookupValue = benv.lookup(name);
-      if (lookupValue !== BOT)
-      {
-        value = value.join(lookupValue);
-        continue;
-      }
-      var parentas = benv.parentas;
-      todo = todo.concat(parentas);
-    }
+    var benv = store.lookupAval(benva);
+    var value = benv.lookup(name);
     if (value === BOT)
     {
       throw new Error("undefined: " + node);
     }
     return kont.pop(function (frame) {
-        return new KontState(tid, frame, value, state)
+        return new KontState(frame, value, tid, state)
     });
   }
 
   function evalBegin(node, tid, state, kont)
   {
     var exps = node.cdr;
+    var benva = state.getBenva(tid);
     if (exps instanceof Null)
     {
       return kont.pop(function (frame) {
-          return new KontState(tid, frame, L_UNDEFINED, state)
+          return new KontState(frame, L_UNDEFINED, tid, state)
       });
     }
     if (exps.cdr instanceof Null)
     {
-      return kont.unch(new EvalState(node, tid, state));
+      return kont.unch(new EvalState(exps.car, tid, state));
     }
-    var frame = new BeginKont(node, exps, tid, state);
+    var frame = new BeginKont(node, exps, benva, tid);
     return kont.push(frame, new EvalState(exps.car, tid, state));
   }
 
-  function evalSet(node, tid, state, kont)
+  function isApplication(node)
   {
-    if (node.cdr instanceof Null || node.cdr.cdr instanceof Null ||
-        node.cdr.car instanceof Pair)
+    return node instanceof Pair
+      && !SchemeParser.isSyntacticKeyword(node.car.name)
+  }
+
+  function scanOpers(s, kont)
+  {
+    var visited = HashSet.empty();
+
+    function helper(q)
     {
-      throw new Error("invalid set!: " + node);
+      if (visited.contains(q))
+      {
+        return [];
+      }
+      visited = visited.add(q);
+      var epsOperFrameSuccs = kont.ecg.outgoing(q).flatMap(
+        function (h)
+        {
+          return h.g && (h.g.frame instanceof OperatorKont || h.g.frame instanceof OperandsKont) ? [h.target] : [];
+        });
+      if (epsOperFrameSuccs.length === 0)
+      {
+        return [[q]];
+      }
+      var rs = epsOperFrameSuccs.flatMap(helper);
+      var rs2 = rs.map(function (r) {return r.addFirst(q)});
+      return rs2;
     }
-    var id = node.cdr.car;
-    var exp = node.cdr.cdr.car;
-    var frame = new SetKont(node, tid, store);
-    return kont.push(frame, new EvalState(exp, tid, state))
+    return helper(s);
+  }
+
+  function Memo(ratorRands, store)
+  {
+    assertTrue(ratorRands != null);
+    assertTrue(store != null);
+    this.ratorRands = ratorRands;
+    this.store = store;
+  }
+
+  Memo.updateTable =
+    function (memo, value, table)
+    {
+//      for (var i = 0; i < table.length; i++)
+//      {
+//        var entry = table[i];
+//        if (entry.memo.subsumes(memo))
+//        {
+//          throw new Error("memo " + entry.memo + "->" + entry.value + " already subsumes " + memo + "->" + value);
+//        }
+//      }
+      var table2 = table.filter(function (entry) {return !memo.subsumes(entry.memo)});
+      print("removed from memo table", table.length - table2.length, table2.length + 1);
+      return table2.addLast({memo:memo, value:value});
+    }
+
+  Memo.prototype.toString =
+    function ()
+    {
+      return "<ratorRands " + this.ratorRands + ">";
+    }
+
+  Memo.prototype.subsumes =
+    function (x)
+    {
+      if (this.ratorRands.length !== x.ratorRands.length)
+      {
+        return false;
+      }
+      for (var i = 0; i < this.ratorRands.length; i++)
+      {
+        if (!this.ratorRands[i].subsumes(x.ratorRands[i]))
+        {
+          return false;
+        }
+      }
+      return this.store.subsumes(x.store);
+    }
+
+  Memo.prototype.subsumesButStore = //DEBUG
+    function (x)
+    {
+      if (this.ratorRands.length !== x.ratorRands.length)
+      {
+        return false;
+      }
+      for (var i = 0; i < this.ratorRands.length; i++)
+      {
+        if (!this.ratorRands[i].subsumes(x.ratorRands[i]))
+        {
+          return false;
+        }
+      }
+      return !this.store.subsumes(x.store);
+    }
+
+  function applyKont(frame, value, tid, state, kont)
+  {
+    if (memoFlag)
+    {
+      var store = state.store;
+      var valueForStates = kont.valueFor();
+      var evalStates = valueForStates.filter(function (q) {return q.node && isApplication(q.node)});
+      var operStates = evalStates.flatMap(function (q) {return scanOpers(q, kont)});
+      memoTable = operStates.reduce(
+        function (memoTable, operState)
+        {
+//          var store = operState[operState.length - 1].store;
+          var ratorRands = operState.slice(1).map(function (q) {return q.value});
+          var memo = new Memo(ratorRands, store);
+          print("memoizing", operState[0].node, memo, value);
+          return Memo.updateTable(memo, value, memoTable);
+        }, memoTable);
+    }
+    return frame.apply(value, tid, state, kont);
   }
 
   function applyProc(node, operatorValue, operandValues, tid, state, kont)
   {
     var store = state.store;
+    if (memoFlag)
+    {
+      var memo = new Memo([operatorValue].concat(operandValues), store);
+      var matchingEntries = memoTable.flatMap(
+        function (entry)
+        {
+          var entryMemo = entry.memo;
+          if (entryMemo.subsumesButStore(memo))
+          {
+            print("==", entryMemo, entryMemo.store.diff(store));
+          }
+          return entryMemo.subsumes(memo) ? [entry] : [];
+        });
+      var memoValue = matchingEntries.map(function (entry) {return entry.value}).reduce(Lattice.join, BOT);
+      var memoStore = matchingEntries.map(function (entry) {return entry.memo.store}).reduce(Lattice.join, BOT);
+      if (matchingEntries.length > 0)
+      {
+        print("using", kont.source, "#", matchingEntries.length, "value", memoValue);
+        return kont.pop(function (frame) {
+            return new KontState(frame, memoValue, tid, state.setStore(memoStore))
+        }, "MEMO");
+      }
+    }
     var operatorAs = operatorValue.addresses();
     if (operatorAs.length === 0)
     {
@@ -1099,28 +1249,19 @@ function pschemeCesk(cc)
       })
   }
 
-  function applyKont(frame, value, tid, state, kont)
-  {
-    if (frame.isMarker)
-    {
-      return kont.pop(function (frame) {
-          return new KontState(frame, value, tid, state)
-      });
-    }
-    return frame.apply(value, tid, state, kont);
-  }
-
   function evalIf(node, tid, state, kont)
   {
+    var benva = state.getBenva(tid);
     var condition = node.cdr.car;
-    var frame = new IfKont(node, tid, state);
+    var frame = new IfKont(node, benva, tid);
     return kont.push(frame, new EvalState(condition, tid, state));
   }
 
   function evalApplication(node, tid, state, kont)
   {
+    var benva = state.getBenva(tid);
     var operator = node.car;
-    var frame = new OperatorKont(node, tid, state);
+    var frame = new OperatorKont(node, benva, tid);
     return kont.push(frame, new EvalState(operator, tid, state));
   }
 
@@ -1162,7 +1303,7 @@ function pschemeCesk(cc)
         }
         if (name === "set!")
         {
-          return evalSet(node, tid, state, kont);
+          throw new Error("set! not yet implemented");
         }
       }
       return evalApplication(node, tid, state, kont);
@@ -1171,7 +1312,6 @@ function pschemeCesk(cc)
   }
 
   var module = {};
-  // TODO: module.evalState does not seem to be needed anywhere
   module.p = p;
   module.l = l;
   module.store = store;
@@ -1303,7 +1443,7 @@ JipdaValue.prototype.compareTo =
     {
       return 1;
     }
-    
+
     if (x === this)
     {
       return 0;
