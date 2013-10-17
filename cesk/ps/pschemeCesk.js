@@ -165,10 +165,13 @@ function pschemeCesk(cc)
     }
 
   // Threads = TID × Context
-  function Thread(tid, context)
+  function Thread(tid, context, frame, value)
   {
     this.tid = tid;
     this.context = context;
+    // Stored frame and value, might be null
+    this.frame = frame;
+    this.value = value;
   }
   Thread.prototype.toString =
     function ()
@@ -180,7 +183,9 @@ function pschemeCesk(cc)
     {
       return (x instanceof Thread)
         && Eq.equals(this.tid, x.tid)
-        && Eq.equals(this.context, x.context);
+        && Eq.equals(this.context, x.context)
+        && Eq.equals(this.frame, x.frame)
+        && Eq.equals(this.value, x.value);
     }
   Thread.prototype.hashCode =
     function ()
@@ -189,6 +194,14 @@ function pschemeCesk(cc)
       var result = 1;
       result = prime * result + this.tid.hashCode();
       result = prime * result + this.context.hashCode();
+      if (this.frame !== null)
+      {
+        result = prime * result + this.frame.hashCode();
+      }
+      if (this.value !== null)
+      {
+        result = prime * result + this.frame.hashCode();
+      }
     }
   Thread.prototype.addresses =
     function ()
@@ -204,6 +217,11 @@ function pschemeCesk(cc)
     function (benva)
     {
       return new Thread(this.tid, this.context.setBenva(benva));
+    }
+  Thread.prototype.saveFrame =
+    function (frame, value)
+    {
+      return new Thread(this.tid, this.context, frame, value);
     }
   function createThread(node, benva)
   {
