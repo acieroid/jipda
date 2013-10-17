@@ -55,11 +55,15 @@ function pschemeCesk(cc)
     {
       if ((x instanceof MachineState)
           && Eq.equals(this.store, x.store)
-          && this.threads.length === x.threads.length)
+          && this.threads.size() === x.threads.size())
       {
-        for (var i = 0; i < this.threads.length; i++)
+        var keys = this.threads.keys();
+        var keysX = x.threads.keys();
+        for (var i = 0; i < keys.length; i++)
         {
-          if (!Eq.equals(this.threads.get(i, null), x.threads.get(i, null)))
+          if (!(Eq.equals(keys[i], keysX[i]) &&
+                Eq.equals(this.threads.get(keys[i], null),
+                          x.threads.get(keys[i], null))))
           {
             return false;
           }
@@ -73,9 +77,11 @@ function pschemeCesk(cc)
     {
       var prime = 7;
       var result = 1;
-      for (var i = 0; i < this.threads.length; i++)
+      var keys = this.threads.keys();
+      for (var i = 0; i < keys.length; i++)
       {
-        result = prime * result + this.threads.get(i, null).hashCode();
+        var thread = this.threads.get(keys[i], null);
+        result = prime * result + thread.hashCode();
       }
       return result;
     }
@@ -88,14 +94,14 @@ function pschemeCesk(cc)
     function (tid)
     {
       var thread = this.threads.get(tid, null);
-      // assert(thread != null);
+      assertDefinedNotNull(thread);
       return thread.context.benva;
     }
   MachineState.prototype.setBenva =
     function (tid, benva)
     {
       var thread = this.threads.get(tid, null);
-      // assert(thread != null);
+      assertDefinedNotNull(thread);
       thread = thread.setBenva(benva);
       return new MachineState(this.threads.put(tid, thread), this.store);
     }
@@ -103,14 +109,14 @@ function pschemeCesk(cc)
     function (tid)
     {
       var thread = this.threads.get(tid, null);
-      // assert(thread !== null);
+      assertDefinedNotNull(thread);
       return thread.context.node;
     }
   MachineState.prototype.setNode =
     function (tid, node)
     {
       var thread = this.threads.get(tid, null);
-      // assert(thread !== null);
+      assertDefinedNotNull(thread);
       thread = thread.setNode(node);
       return new MachineState(this.threads.put(tid, thread), this.store);
     }
@@ -118,6 +124,14 @@ function pschemeCesk(cc)
     function (thread)
     {
       return new MachineState(this.threads.put(thread.tid, thread), this.store);
+    }
+  MachineState.prototype.saveFrame =
+    function (tid, frame, value)
+    {
+      var thread = this.threads.get(tid, null);
+      assertDefinedNotNull(thread);
+      var threads = this.threads.put(tid, thread.saveFrame(frame, value));
+      return new MachineState(threads, this.store);
     }
 
   // Context = Exp × Env × Addr × Hist
@@ -152,6 +166,7 @@ function pschemeCesk(cc)
       result = prime * result + this.benva.hashCode();
       result = prime * result + this.frame.hashCode();
       result = prime * result + this.history.hashCode();
+      return result;
     }
   Context.prototype.setNode =
     function (node)
@@ -194,14 +209,15 @@ function pschemeCesk(cc)
       var result = 1;
       result = prime * result + this.tid.hashCode();
       result = prime * result + this.context.hashCode();
-      if (this.frame !== null)
+      if (this.frame !== undefined && this.frame !== null)
       {
         result = prime * result + this.frame.hashCode();
       }
-      if (this.value !== null)
+      if (this.value !== undefined && this.value !== null)
       {
-        result = prime * result + this.frame.hashCode();
+        result = prime * result + this.value.hashCode();
       }
+      return result;
     }
   Thread.prototype.addresses =
     function ()
@@ -606,10 +622,10 @@ function pschemeCesk(cc)
   {
     this.type = "kont";
     this.frame = frame;
-    this.value = value; // TODO: store it somewhere in the state
+    this.value = value;
     this.store = state.store;
     this.tid = tid;
-    this.state = state;
+    this.state = state.saveFrame(tid, frame, value);
   }
   KontState.prototype.equals =
     function (x)
