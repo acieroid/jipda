@@ -8,7 +8,8 @@ var suiteConcreteTests =
   {
     var ast = new SchemeParser().parse(src)[0];
     var lat = new CpLattice();
-    var cesk = schemeCesk({a:concreteAg, p: new CpLattice()});
+    var cesk = pschemeCesk({a:concreteAg, p: new CpLattice(),
+                            t:tagTg, h:unboundedHistory});
     var result = new Pushdown().analyze(ast, cesk);
     var actual = result.stepFwOver(result.initial).map(function (q) {return q.value}).reduce(Lattice.join, BOT);
     assertEquals(cesk.l.abst1(expected), actual);

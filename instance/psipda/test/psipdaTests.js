@@ -15,7 +15,8 @@ var suiteSipdaTests =
   function createCesk(cc)
   {
     cc = cc || {};
-    return schemeCesk({a:cc.a || tagAg, p:cc.p || new Lattice1()});
+    return pschemeCesk({a:cc.a || tagAg, p:cc.p || new Lattice1(),
+                        t:cc.t || tagTg, h:cc.h || unboundedHistory});
   }
 
   module.test1a =
